@@ -16,12 +16,17 @@ class KongAPI {
 
         logger.info(`Starting Kong configuration, kong admin url: ${kongAdminUrl}`);
         let apis = this.kong_config.apis;
+        let rootPlugins = this.kong_config.root_plugins;
         try {
             // Create APIs
-            await this.createApis(apis);
+            if (apis) {
+                await this.createApis(apis);
+            }
 
             // Config root plugins:
-            await this.createPlugins(this.kong_config.root_plugins);
+            if (rootPlugins) {
+                await this.createPlugins(rootPlugins);
+            }
         } catch (err) {
             logger.error(err, 'Error during configuration creation');
             throw (err);
