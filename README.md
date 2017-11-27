@@ -16,7 +16,7 @@ This is a [Node.js](https://nodejs.org/en/) module available through the
 [`npm install` command](https://docs.npmjs.com/getting-started/installing-npm-packages-locally):
 
 ```sh
-$ npm install kong-admin-client
+$ npm install kong-admin-client --save
 ```
 
 ## Usage
@@ -33,7 +33,7 @@ let kongAPI = new KongAPI({
             "plugins": [{
                 "name": "rate-limiting",
                 "config": {
-                    "second": "rate-limiting",
+                    "second": "5",
                     "hour": "10000"
                 }
             }]

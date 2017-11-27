@@ -77,7 +77,7 @@ let sendRequestAndProcessError = function (options, expectedStatuses) {
     return request(options)
         .then((res) => {
             if (!expectedStatuses.includes(res.statusCode)) {
-                logger.error(`Error during get plugin, expected status ${expectedStatus}, got: ${res.statusCode}`)
+                logger.error(`Error during get plugin, expected status ${expectedStatuses}, got: ${res.statusCode}`)
                 logger.error(`Error body: ${JSON.stringify(res.body)}`)
                 throw new Error(`Error in ${options.method}, ${options.uri}`)
             }
