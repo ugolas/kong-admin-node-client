@@ -1,0 +1,35 @@
+{
+    "name": "kong-admin-node-client",
+    "version": "1.0.0",
+    "description": "Kong admin API client in node",
+    "main": "index.js",
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ugolas/kong-admin-node-client.git"
+    },
+    "keywords": [
+        "kong",
+        "admin",
+        "api",
+        "node"
+    ],
+    "author": "Alex Ugol <alex.ugol@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/ugolas/kong-admin-node-client/issues"
+    },
+    "homepage": "https://github.com/ugolas/kong-admin-node-client#readme",
+    "dependencies": {
+        "bunyan": "^1.8.12",
+        "lodash": "^4.17.4",
+        "pkginfo": "^0.4.1",
+        "request": "^2.83.0",
+        "request-promise": "^4.2.2"
+    }
+}
