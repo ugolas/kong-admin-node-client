@@ -25,7 +25,7 @@ let KongAPI = require('kong-admin-node-client');
 
 let kongAPI = new KongAPI({
     kong_config: {
-        "kong_admin_api_url": http://mky-kong:8001,
+        "kong_admin_api_url": "http://mky-kong:8001",
         "apis": [{
             "name": "myApp",
             "uris": "/path/",
@@ -49,7 +49,7 @@ let kongAPI = new KongAPI({
 });
 
 
-kongAPI.createConfigurations(kong_config)
+kongAPI.createConfigurations()
     .then((result) => {
         // Success
     })
