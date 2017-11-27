@@ -20,3 +20,41 @@ $ npm install kong-admin-client
 ```
 
 ## Usage
+```js
+let KongAPI = require('kong-admin-node-client');
+
+let kongAPI = new KongAPI({
+    kong_config: {
+        "kong_admin_api_url": http://mky-kong:8001,
+        "apis": [{
+            "name": "myApp",
+            "uris": "/path/",
+            "upstream_url": "http://my-upstream-url.com",
+            "plugins": [{
+                "name": "rate-limiting",
+                "config": {
+                    "second": "rate-limiting",
+                    "hour": "10000"
+                }
+            }]
+        }],
+        "root_plugins": [{
+            "name": "request-termination",
+            "config": {
+                "status_code": 403,
+                "message": "So long and thanks for all the fish!"
+            }
+        }]
+    }
+});
+
+
+kongAPI.createConfigurations(kong_config)
+    .then((result) => {
+        // Success
+    })
+    .catch((err) => {
+        // Failure
+    });
+
+```
