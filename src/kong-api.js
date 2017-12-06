@@ -71,6 +71,21 @@ class KongAPI {
         }
     }
 
+    async removeAPIs(apis) {
+        logger.info(`Removing apis from kong, ${apis.length} in total`);
+        for (let api of apis) {
+            logger.info(`Removing api: ${api.name}, ${apis.indexOf(api) + 1} out of ${apis.length} apis`);
+
+            // Check if exists
+            let removeResponse = await httpHelper.deleteAPI({
+                url: this.kongAdminUrl,
+                apiName: api.name
+            })
+
+            logger.info(`Configuration for api: ${api.name} was removed successfully`);
+        }
+    }
+
     async createPlugins(plugins, apiName) {
         logger.info(apiName ? `Setting up plugins in api: ${apiName}, ${plugins.length} in total` : `Setting up plugins, ${plugins.length} in total`);
         // Check if exists

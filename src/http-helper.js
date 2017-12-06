@@ -16,6 +16,20 @@ let createAPI = function ({
     return sendRequestAndProcessError(requestOptions, [200, 201])
 };
 
+let deleteAPI = function ({
+    url,
+    apiName
+}) {
+    let options = {
+        method: 'DELETE',
+        uri: `${url}/apis/${apiName}`,
+        body: body
+    };
+
+    var requestOptions = _.assign(options, basicRequest);
+    return sendRequestAndProcessError(requestOptions, [204])
+};
+
 let getAPI = function ({
     url,
     apiName
@@ -77,7 +91,7 @@ let sendRequestAndProcessError = function (options, expectedStatuses) {
     return request(options)
         .then((res) => {
             if (!expectedStatuses.includes(res.statusCode)) {
-                logger.error(`Error during get plugin, expected status ${expectedStatuses}, got: ${res.statusCode}`)
+                logger.error(`Error during operation, expected status ${expectedStatuses}, got: ${res.statusCode}`)
                 logger.error(`Error body: ${JSON.stringify(res.body)}`)
                 throw new Error(`Error in ${options.method}, ${options.uri}`)
             }
