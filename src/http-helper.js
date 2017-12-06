@@ -110,6 +110,7 @@ let basicRequest = {
 module.exports = {
     createAPI: createAPI,
     getAPI: getAPI,
+    deleteAPI: deleteAPI,
     createPlugin: createPlugin,
     getPlugin: getPlugin,
     getPlugins: getPlugins
