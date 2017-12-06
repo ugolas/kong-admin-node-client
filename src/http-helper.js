@@ -22,8 +22,7 @@ let deleteAPI = function ({
 }) {
     let options = {
         method: 'DELETE',
-        uri: `${url}/apis/${apiName}`,
-        body: body
+        uri: `${url}/apis/${apiName}`
     };
 
     var requestOptions = _.assign(options, basicRequest);
