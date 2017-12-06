@@ -83,7 +83,7 @@ class KongAPI {
             })
 
             if (removeResponse.statusCode === 404) {
-                logger.info(`API ${apiName} not found. Skipping it.`)
+                logger.info(`API ${api.name} not found. Skipping it.`)
             }
 
             logger.info(`Configuration for api: ${api.name} was removed successfully`);
