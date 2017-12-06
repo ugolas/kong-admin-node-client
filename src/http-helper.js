@@ -26,7 +26,7 @@ let deleteAPI = function ({
     };
 
     var requestOptions = _.assign(options, basicRequest);
-    return sendRequestAndProcessError(requestOptions, [204])
+    return sendRequestAndProcessError(requestOptions, [204, 404])
 };
 
 let getAPI = function ({
