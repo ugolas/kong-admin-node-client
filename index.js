@@ -4,5 +4,5 @@ let kongAPI = require('./src/kong-api'),
 module.exports = kongAPI;
 
 process.on('unhandledRejection', (err) => {
-    logger.error(error);
+    logger.error(err);
 })

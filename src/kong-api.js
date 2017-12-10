@@ -19,12 +19,12 @@ class KongAPI {
         let rootPlugins = this.kong_config.root_plugins;
         try {
             // Create APIs
-            if (apis) {
+            if (apis && apis.length > 0) {
                 await this.createApis(apis);
             }
 
             // Config root plugins:
-            if (rootPlugins) {
+            if (rootPlugins && rootPlugins.length > 0) {
                 await this.createPlugins(rootPlugins);
             }
         } catch (err) {
