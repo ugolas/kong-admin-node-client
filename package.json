@@ -1,6 +1,6 @@
 {
   "name": "kong-admin-node-client",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Kong admin API client in node",
   "main": "index.js",
   "directories": {
