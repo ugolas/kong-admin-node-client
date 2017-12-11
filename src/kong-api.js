@@ -48,7 +48,7 @@ class KongAPI {
             let getResponse = await httpHelper.getAPI({
                 url: this.kongAdminUrl,
                 apiName: api.name
-            })
+            });
 
             // If API exists
             if (getResponse.statusCode === 200) {
@@ -60,13 +60,13 @@ class KongAPI {
             let response = await httpHelper.createAPI({
                 url: this.kongAdminUrl,
                 body: api
-            })
+            });
             let apiId = response.body.id;
             logger.info(`Configuration for api: ${api.name} set up successfully: ${apiId}`);
 
             // Create plugins for API
             if (apiPlugins) {
-                await this.createPlugins(apiPlugins, api.name, apiId);
+                await this.createPlugins(apiPlugins, api.name);
             }
         }
     }
@@ -80,10 +80,10 @@ class KongAPI {
             let removeResponse = await httpHelper.deleteAPI({
                 url: this.kongAdminUrl,
                 apiName: api.name
-            })
+            });
 
             if (removeResponse.statusCode === 404) {
-                logger.info(`API ${api.name} not found. Skipping it.`)
+                logger.info(`API ${api.name} not found. Skipping it.`);
             }
 
             logger.info(`Configuration for api: ${api.name} was removed successfully`);
@@ -95,8 +95,8 @@ class KongAPI {
         // Check if exists
         let getPluginsResponse = await httpHelper.getPlugins({
             url: this.kongAdminUrl,
-            apiName: apiName
-        })
+            apiId: apiName
+        });
 
         let existingPlugins = getPluginsResponse.body.data;
 
@@ -122,7 +122,7 @@ class KongAPI {
                 body: plugin
             });
 
-            logger.info(`Configuration for plugin: ${plugin.name} set up successfully: ${response.body.id}`)
+            logger.info(`Configuration for plugin: ${plugin.name} set up successfully: ${response.body.id}`);
         }
     }
 }
