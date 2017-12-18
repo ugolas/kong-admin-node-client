@@ -1,3 +1,9 @@
+[![NPM Version][npm-image]][npm-url]
+[![Build Status][travis-image]][travis-url]
+[![Test Coverage][coveralls-image]][coveralls-url]
+[![NPM Downloads][downloads-image]][downloads-url]
+[![MIT License][license-image]][license-url]
+
 # kong admin client API
 Client API for configuring Kong admin.
 
@@ -58,3 +64,13 @@ kongAPI.createConfigurations()
     });
 
 ```
+[npm-image]: https://img.shields.io/npm/v/express-requests-logger.svg?style=flat
+[npm-url]: https://www.npmjs.com/package/kong-admin-node-client
+[travis-image]: https://travis-ci.org/ugolas/kong-admin-node-client.svg?branch=master
+[travis-url]: https://travis-ci.org/ugolas/kong-admin-node-client
+[coveralls-image]: https://coveralls.io/repos/github/ugolas/kong-admin-node-client/badge.svg?branch=master
+[coveralls-url]: https://coveralls.io/github/ugolas/kong-admin-node-client?branch=master
+[downloads-image]: http://img.shields.io/npm/dm/kong-admin-node-client.svg?style=flat
+[downloads-url]: https://npmjs.org/package/kong-admin-node-client
+[license-image]: http://img.shields.io/badge/license-MIT-blue.svg?style=flat
+[license-url]: LICENSE
