@@ -45,6 +45,80 @@ describe('Kong API tests', () => {
         });
     });
 
+    describe.only('When calling getAPIS', () => {
+        let kongAPI;
+        let url = 'url';
+
+        before(() => {
+            kongAPI = new KongAPI({
+                kong_config: {
+                    kong_admin_api_url: url
+                }
+            });
+        });
+        afterEach(() => {
+            sandbox.resetHistory();
+        });
+
+        it('should return all kong configured apis when api argument is missing', () => {
+            getAPIStub.returns(Promise.resolve({
+                statusCode: 200,
+                body: [
+                    {
+                        name: 'api1'
+                    },
+                    {
+                        name: 'api2'
+                    }
+                ]
+            }));
+
+            return kongAPI.getAPIs()
+                .then((response) => {
+                    should(getAPIStub.calledOnce).eql(true);
+                    should(getAPIStub.calledWith({
+                        url: url
+                    })).eql(true);
+                    should(response.length).eql(2);
+                    should(response[0].name).eql('api1');
+                    should(response[1].name).eql('api2');
+                });
+        });
+
+        it.only('should return all requested apis when api argument was passed', () => {
+            let getApisArgument = [
+                {
+                    name: 'api1'
+                },
+                {
+                    name: 'api2'
+                }
+            ];
+
+            getAPIStub.onCall(0).returns(Promise.resolve({
+                statusCode: 200,
+                body: {
+                    name: 'api1'
+                }
+            }));
+
+            getAPIStub.onCall(1).returns(Promise.resolve({
+                statusCode: 200,
+                body: {
+                    name: 'api2'
+                }
+            }));
+
+            return kongAPI.getAPIs(getApisArgument)
+                .then((response) => {
+                    should(getAPIStub.calledTwice).eql(true);
+                    should(response.length).eql(2);
+                    should(response[0].name).eql('api1');
+                    should(response[1].name).eql('api2');
+                });
+        });
+    });
+
     describe('When calling removeAPIs', () => {
         let kongAPI;
         let apis;
