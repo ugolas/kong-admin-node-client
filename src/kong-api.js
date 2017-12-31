@@ -71,6 +71,47 @@ class KongAPI {
         }
     }
 
+    async getAPIs(apis) {
+        let getResponse = [];
+        apis = Array.isArray(apis) ? apis : [];
+
+        if (apis.length === 0) {
+            // Get all configured API's
+            let response = await httpHelper.getAPI({
+                url: this.kongAdminUrl
+            });
+
+            if (response.statusCode === 200) {
+                getResponse = response.body;
+            }
+
+            return getResponse;
+        }
+
+        for(let i = 0; i < apis.length; i++) {
+            let api = apis[i];
+
+            if (!api.name) {
+                logger.info('skip api since no api name was found. api:' + JSON.stringify(api));
+                continue;
+            }
+
+            logger.info(`getting api: ${api.name}, ${apis.indexOf(api) + 1} out of ${apis.length} apis`);
+
+
+            let response = await httpHelper.getAPI({
+                url: this.kongAdminUrl,
+                apiName: api.name
+            });
+
+            if (response.statusCode === 200) {
+                getResponse.push(response.body);
+            }
+        }
+
+        return getResponse;
+    }
+
     async removeAPIs(apis) {
         logger.info(`Removing apis from kong, ${apis.length} in total`);
         for (let api of apis) {

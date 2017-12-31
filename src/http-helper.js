@@ -23,10 +23,15 @@ let deleteAPI = function ({ url, apiName }) {
 
 let getAPI = function ({ url, apiName }) {
     let options = {
-        uri: `${url}/apis/${apiName}`
+        uri: `${url}/apis`
     };
+
+    if (apiName) {
+        options.uri += `/${apiName}`
+    }
+
     logger.info({ req: options }, 'getAPI');
-    var requestOptions = _.assign(options, basicRequest);
+    let requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.get, requestOptions, [200, 404]);
 };
 
