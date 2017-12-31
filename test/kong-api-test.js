@@ -45,7 +45,7 @@ describe('Kong API tests', () => {
         });
     });
 
-    describe.only('When calling getAPIS', () => {
+    describe('When calling getAPIS', () => {
         let kongAPI;
         let url = 'url';
 
@@ -85,7 +85,7 @@ describe('Kong API tests', () => {
                 });
         });
 
-        it.only('should return all requested apis when api argument was passed', () => {
+        it('should return all requested apis when api argument was passed', () => {
             let getApisArgument = [
                 {
                     name: 'api1'
@@ -339,13 +339,13 @@ describe('Kong API tests', () => {
             });
         });
         beforeEach(() => {
+            sandbox.resetHistory();
             apis = [{
                 name: api,
                 plugins: [{
                     name: plugin
                 }]
             }];
-            sandbox.resetHistory();
         });
         it('Should succeed if all succeeds', () => {
             getAPIStub.returns(Promise.resolve({
