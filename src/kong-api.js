@@ -146,10 +146,10 @@ class KongAPI {
             });
 
             let existingPlugins = getPluginsResponse.body.data;
-
+            let existingPlugin;
             // Add Id to request so it will update the resource
             if (existingPlugins.length > 0) {
-                let existingPlugin = _.find(existingPlugins, function (element) {
+                existingPlugin = _.find(existingPlugins, function (element) {
                     return element.name === plugin.name;
                 });
 
