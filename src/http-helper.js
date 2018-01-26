@@ -27,7 +27,7 @@ let getAPI = function ({ url, apiName }) {
     };
 
     if (apiName) {
-        options.uri += `/${apiName}`
+        options.uri += `/${apiName}`;
     }
 
     logger.info({ req: options }, 'getAPI');
@@ -54,14 +54,20 @@ let getPlugin = function ({ url, pluginName, apiId }) {
     return sendRequestAndProcessError(request.get, requestOptions, [200]);
 };
 
-let getPlugins = function ({ url, apiId }) {
+let getPlugins = function ({ url, apiId, pluginName }) {
     let options = {
         uri: apiId ? `${url}/apis/${apiId}/plugins/` : `${url}/plugins/`
     };
+
+    if (pluginName){
+        options.qs = {
+            name: pluginName
+        };
+    }
+
     logger.info({ req: options }, 'getPlugins');
     var requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.get, requestOptions, [200]);
-
 };
 
 let sendRequestAndProcessError = function (requestMethod, options, expectedStatuses) {

@@ -206,7 +206,7 @@ describe('Kong API tests', () => {
             }));
             return kongAPI.createPlugins(plugins, apiName)
                 .then(() => {
-                    should(getPluginsStub.calledOnce).eql(true);
+                    should(getPluginsStub.callCount).eql(3);
                     should(createPluginStub.callCount).eql(3);
                     for(let plugin of plugins){
                         should(createPluginStub.calledWith({

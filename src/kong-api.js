@@ -133,17 +133,20 @@ class KongAPI {
 
     async createPlugins(plugins, apiName) {
         logger.info(apiName ? `Setting up plugins in api: ${apiName}, ${plugins.length} in total` : `Setting up plugins, ${plugins.length} in total`);
-        // Check if exists
-        let getPluginsResponse = await httpHelper.getPlugins({
-            url: this.kongAdminUrl,
-            apiId: apiName
-        });
-
-        let existingPlugins = getPluginsResponse.body.data;
 
         // Config plugins
         for (let plugin of plugins) {
             logger.info(apiName ? `Setting up plugin: ${plugin.name} in api: ${apiName}, ${plugins.indexOf(plugin) + 1} out of ${plugins.length} plugins` : `Setting up plugin: ${plugin.name}, ${plugins.indexOf(plugin) + 1} out of ${plugins.length}  plugins`);
+
+            // Try finding existing plugin
+            let getPluginsResponse = await httpHelper.getPlugins({
+                url: this.kongAdminUrl,
+                apiId: apiName,
+                pluginName: plugin.name
+            });
+
+            let existingPlugins = getPluginsResponse.body.data;
+
             // Add Id to request so it will update the resource
             if (existingPlugins.length > 0) {
                 let existingPlugin = _.find(existingPlugins, function (element) {
@@ -154,6 +157,8 @@ class KongAPI {
                 if (existingPlugin) {
                     logger.info(apiName ? `Plugin: ${plugin.name} in api: ${apiName}' already exists, updating it's configuration` : `Plugin: ${plugin.name} already exists, updating it's configuration`);
                     plugin = _.defaults(plugin, existingPlugin);
+                } else {
+                    logger.info(apiName ? `Plugin: ${plugin.name} in api: ${apiName}' does not exists, creating it` : `Plugin: ${plugin.name} does not exists, creating it`);
                 }
             }
 
