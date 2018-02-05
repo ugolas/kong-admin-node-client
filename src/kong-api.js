@@ -71,14 +71,15 @@ class KongAPI {
         }
     }
 
-    async getAPIs(apis) {
+    async getAPIs(apis, options) {
         let getResponse = [];
         apis = Array.isArray(apis) ? apis : [];
 
         if (apis.length === 0) {
             // Get all configured API's
             let response = await httpHelper.getAPI({
-                url: this.kongAdminUrl
+                url: this.kongAdminUrl,
+                queryParams: options && typeof options === 'object' && options.queryParams
             });
 
             if (response.statusCode === 200) {
@@ -131,6 +132,26 @@ class KongAPI {
         }
     }
 
+    async removePlugins(apiName, plugins) {
+        logger.info(`Removing plugins from kong api: ${apiName}. ${plugins.length} in total`);
+        for(let plugin in plugins) {
+            logger.info(`Removing plugin: ${plugin.name}, ${plugins.indexOf(plugin) + 1} out of ${plugins.length} plugins`);
+
+            // Check if exists
+            let removeResponse = await httpHelper.deletePlugin({
+                url: this.kongAdminUrl,
+                apiName: apiName,
+                pluginName: plugin.name
+            });
+
+            if (removeResponse.statusCode === 404) {
+                logger.info(`API ${plugin.name} not found. Skipping it.`);
+            }
+
+            logger.info(`Configuration for api: ${plugin.name} was removed successfully`);
+        }
+    }
+
     async createPlugins(plugins, apiName) {
         logger.info(apiName ? `Setting up plugins in api: ${apiName}, ${plugins.length} in total` : `Setting up plugins, ${plugins.length} in total`);
         // Check if exists
@@ -154,6 +175,8 @@ class KongAPI {
                 if (existingPlugin) {
                     logger.info(apiName ? `Plugin: ${plugin.name} in api: ${apiName}' already exists, updating it's configuration` : `Plugin: ${plugin.name} already exists, updating it's configuration`);
                     plugin = _.defaults(plugin, existingPlugin);
+
+                    existingPlugins.splice(existingPlugins.findIndex(x => x.name === plugin.name), 1);
                 }
             }
 
@@ -164,6 +187,11 @@ class KongAPI {
             });
 
             logger.info(`Configuration for plugin: ${plugin.name} set up successfully: ${response.body.id}`);
+        }
+
+        // if existing plugins list it not empty, remove all the list plugins from kong api
+        if (existingPlugins.length > 0) {
+            await this.removePlugins(apiName, existingPlugins);
         }
     }
 }

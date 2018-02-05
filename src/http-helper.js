@@ -21,13 +21,34 @@ let deleteAPI = function ({ url, apiName }) {
     return sendRequestAndProcessError(request.delete, requestOptions, [204, 404]);
 };
 
-let getAPI = function ({ url, apiName }) {
+let deletePlugin = function ({url, apiName, pluginName}) {
+    let options = {
+        uri: `${url}/apis/${apiName}/plugins/${pluginName}`
+    };
+    logger.info({ req: options }, 'deletePlugin');
+    let requestOptions = _.assign(options, basicRequest);
+    return sendRequestAndProcessError(request.delete, requestOptions, [204, 404]);
+};
+
+let getAPI = function ({ url, apiName, queryParams }) {
     let options = {
         uri: `${url}/apis`
     };
 
     if (apiName) {
         options.uri += `/${apiName}`
+    }
+
+    if (Array.isArray(queryParams)) {
+        let firstQueryParam = true;
+
+        queryParams.forEach((queryParam) => {
+            if (queryParam.key && queryParam.value) {
+                options.uri += firstQueryParam ? '?' : '&';
+                options.uri += `${queryParam.key}=${queryParam.value}`;
+                firstQueryParam = false;
+            }
+        })
     }
 
     logger.info({ req: options }, 'getAPI');
@@ -90,5 +111,6 @@ module.exports = {
     deleteAPI: deleteAPI,
     createPlugin: createPlugin,
     getPlugin: getPlugin,
-    getPlugins: getPlugins
+    getPlugins: getPlugins,
+    deletePlugin: deletePlugin
 };

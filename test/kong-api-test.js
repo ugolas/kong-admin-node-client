@@ -4,7 +4,7 @@ let httpHelper = require('../src/http-helper'),
     should = require('should'),
     sinon = require('sinon');
 
-let getAPIStub, createAPIStub, deleteAPIStub, getPluginsStub, createPluginStub;
+let getAPIStub, createAPIStub, deleteAPIStub, getPluginsStub, createPluginStub, deletePluginStub;
 let sandbox;
 describe('Kong API tests', () => {
     before(() => {
@@ -14,7 +14,7 @@ describe('Kong API tests', () => {
         deleteAPIStub = sandbox.stub(httpHelper, 'deleteAPI');
         getPluginsStub = sandbox.stub(httpHelper, 'getPlugins');
         createPluginStub = sandbox.stub(httpHelper, 'createPlugin');
-
+        deletePluginStub = sandbox.stub(httpHelper, 'deletePlugin');
     });
     after(() => {
         sandbox.restore();
@@ -240,6 +240,7 @@ describe('Kong API tests', () => {
             .then(() => {
                 should(getPluginsStub.calledOnce).eql(true);
                 should(createPluginStub.calledOnce).eql(true);
+                should(deletePluginStub.calledOnce).eql(false);
                 should(createPluginStub.calledWith({
                     url: url,
                     apiId: apiName,
@@ -249,6 +250,51 @@ describe('Kong API tests', () => {
                     }
                 })).eql(true);
             });
+        });
+        it('Should succeed if all succeeds and all plugins already exists except one and this plugin should be removed ', () => {
+            plugins = [
+                {
+                    name: plugin + '1'
+                }
+            ];
+
+            getPluginsStub.returns(Promise.resolve({
+                statusCode: 200,
+                body: {
+                    data:[{
+                        id: 'id',
+                        name: 'plugin-name1'
+                    }, {
+                        id: 'id2',
+                        name: 'plugin2'
+                    }]
+                }
+            }));
+
+            createPluginStub.returns(Promise.resolve({
+                statusCode: 200,
+                body:{
+                    id: 'id'
+                }
+            }));
+
+            deletePluginStub.returns(Promise.resolve({
+                statusCode: 204
+            }));
+            return kongAPI.createPlugins(plugins, apiName)
+                .then(() => {
+                    should(getPluginsStub.calledOnce).eql(true);
+                    should(createPluginStub.calledOnce).eql(true);
+                    should(deletePluginStub.calledOnce).eql(true);
+                    should(createPluginStub.calledWith({
+                        url: url,
+                        apiId: apiName,
+                        body: {
+                            id: 'id',
+                            name: 'plugin-name1'
+                        }
+                    })).eql(true);
+                });
         });
     });
 
@@ -464,7 +510,34 @@ describe('Kong API tests', () => {
                 .then((response) => {
                     should(getAPIStub.calledOnce).eql(true);
                     should(getAPIStub.calledWith({
-                        url: url
+                        url: url,
+                        queryParams: undefined
+                    })).eql(true);
+                    should(response.length).eql(2);
+                    should(response[0].name).eql('api1');
+                    should(response[1].name).eql('api2');
+                });
+        });
+
+        it('should return all kong configured apis when api argument is missing. options is object with query params', () => {
+            getAPIStub.returns(Promise.resolve({
+                statusCode: 200,
+                body: [
+                    {
+                        name: 'api1'
+                    },
+                    {
+                        name: 'api2'
+                    }
+                ]
+            }));
+
+            return kongAPI.getAPIs(null, {queryParams: 'queryParams'})
+                .then((response) => {
+                    should(getAPIStub.calledOnce).eql(true);
+                    should(getAPIStub.calledWith({
+                        url: url,
+                        queryParams: 'queryParams'
                     })).eql(true);
                     should(response.length).eql(2);
                     should(response[0].name).eql('api1');

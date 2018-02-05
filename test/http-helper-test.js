@@ -3,7 +3,7 @@ let request = require('request-promise'),
     should = require('should'),
     sinon = require('sinon');
 
-describe('HTTP helper test', () => {
+describe.only('HTTP helper test', () => {
     let getStub, putStub, deleteStub;
     let sandbox;
     let url = 'url';
@@ -111,7 +111,7 @@ describe('HTTP helper test', () => {
             });
         });
     });
-    describe('When calling getAPI', () => {
+    describe.only('When calling getAPI', () => {
         beforeEach(() => {
             sandbox.resetHistory();
         });
@@ -123,6 +123,31 @@ describe('HTTP helper test', () => {
             return httpHelper.getAPI({
                 url: url,
                 apiName: name
+            }).then(() => {
+                should(getStub.calledOnce).eql(true);
+                should(getStub.calledWith({
+                    'content-type': 'application/json',
+                    resolveWithFullResponse: true,
+                    json: true,
+                    simple: false,
+                    uri: url + '/apis/' + name
+                })).eql(true);
+            });
+        });
+        it('Should succeed if success with query params', () => {
+            getStub.returns(Promise.resolve({
+                statusCode: 200
+            }));
+
+            return httpHelper.getAPI({
+                url: url,
+                apiName: name,
+                queryParams: [
+                    {
+                        key: 'key1',
+                        value: 'value1'
+                    }
+                ]
             }).then(() => {
                 should(getStub.calledOnce).eql(true);
                 should(getStub.calledWith({
