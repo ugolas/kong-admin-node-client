@@ -135,8 +135,7 @@ describe('Kong API tests', () => {
 
     describe('When calling createPlugins', () => {
         let kongAPI;
-        let plugins;
-        let url = 'url', plugin = 'plugin-name', apiName = 'api';
+        let url = 'url', apiName = 'api';
         before(() => {
             kongAPI = new KongAPI({
                 kong_config: {
@@ -145,16 +144,60 @@ describe('Kong API tests', () => {
             });
         });
         beforeEach(() => {
-            plugins = [{
-                name: plugin
-            }];
             sandbox.resetHistory();
         });
-        it('Should succeed if all succeeds', () => {
+
+        it('Should succeed and only create new apis without delete', () => {
+            let pluginsToCreate = [{
+                name: 'plugin-name',
+                config: {}
+            }];
+
             getPluginsStub.returns(Promise.resolve({
                 statusCode: 200,
                 body: {
                     data:[]
+                }
+            }));
+            createPluginStub.returns(Promise.resolve({
+                statusCode: 200,
+                body:{
+                    id: 200
+                }
+            }));
+
+            return kongAPI.createPlugins(pluginsToCreate, apiName)
+                .then(() => {
+                    should(getPluginsStub.calledTwice).eql(true);
+                    should(createPluginStub.calledOnce).eql(true);
+                    should(deletePluginStub.calledOnce).eql(false);
+                    should(createPluginStub.calledWith(
+                        {
+                            url: url,
+                            apiId: apiName,
+                            body: {
+                                name: pluginsToCreate[0].name,
+                                config: pluginsToCreate[0].config
+                            }
+                        })).eql(true);
+                });
+        });
+
+        it('should succeed and delete one plugin from kong for specific api', () => {
+            let pluginsToCreate = [{
+                name: 'plugin-name',
+                config: {}
+            }];
+
+            let pluginsInKong = [{
+                name: 'some_plugin',
+                api_id: 'some_api_id'
+            }];
+
+            getPluginsStub.returns(Promise.resolve({
+                statusCode: 200,
+                body: {
+                    data: pluginsInKong
                 }
             }));
 
@@ -164,31 +207,167 @@ describe('Kong API tests', () => {
                     id: 200
                 }
             }));
-            return kongAPI.createPlugins(plugins, apiName)
-            .then(() => {
-                should(getPluginsStub.calledOnce).eql(true);
-                should(createPluginStub.calledOnce).eql(true);
-                should(createPluginStub.calledWith(
-                    {
-                        url: url,
-                        apiId: apiName,
-                        body: {
-                            name: plugin
-                        }
-                    })).eql(true);
-            });
+
+            deletePluginStub.returns(Promise.resolve({
+                statusCode: 204
+            }));
+
+            return kongAPI.createPlugins(pluginsToCreate, apiName)
+                .then(() => {
+                    should(getPluginsStub.calledTwice).eql(true);
+                    should(createPluginStub.calledOnce).eql(true);
+                    should(deletePluginStub.calledOnce).eql(true);
+                    should(createPluginStub.calledWith(
+                        {
+                            url: url,
+                            apiId: apiName,
+                            body: {
+                                name: pluginsToCreate[0].name,
+                                config: pluginsToCreate[0].config
+                            }
+                        })).eql(true);
+                });
+
+        });
+
+        it('should succeed and delete two plugins from kong for specific api using pagination', () => {
+            let pluginsToCreate = [{
+                name: 'plugin-name',
+                config: {}
+            }];
+
+            let pluginsInKong = [{
+                name: 'some_plugin',
+                api_id: 'some_api_id'
+            }, {
+                name: 'some_plugin2',
+                api_id: 'some_app_id2'
+            }];
+
+            getPluginsStub.onCall(0).returns(Promise.resolve({
+                statusCode: 200,
+                body: {
+                    data: [pluginsInKong[0]],
+                    offset: 'some_offset'
+                }
+            }));
+
+            getPluginsStub.onCall(1).returns(Promise.resolve({
+                statusCode: 200,
+                body: {
+                    data: [pluginsInKong[1]]
+                }
+            }));
+
+            getPluginsStub.onCall(2).returns(Promise.resolve({
+                statusCode: 200,
+                body: {
+                    data: pluginsInKong
+                }
+            }));
+
+            createPluginStub.returns(Promise.resolve({
+                statusCode: 200,
+                body:{
+                    id: 200
+                }
+            }));
+
+            deletePluginStub.returns(Promise.resolve({
+                statusCode: 204
+            }));
+
+            return kongAPI.createPlugins(pluginsToCreate, apiName)
+                .then(() => {
+                    should(getPluginsStub.calledThrice).eql(true);
+                    should(createPluginStub.calledOnce).eql(true);
+                    should(deletePluginStub.calledTwice).eql(true);
+                    should(createPluginStub.calledWith(
+                        {
+                            url: url,
+                            apiId: apiName,
+                            body: {
+                                name: pluginsToCreate[0].name,
+                                config: pluginsToCreate[0].config
+                            }
+                        })).eql(true);
+                });
+
+        });
+
+        it('should succeed and delete two plugins from kong for root api using pagination', () => {
+            let pluginsToCreate = [{
+                name: 'plugin-name',
+                config: {}
+            }];
+
+            let pluginsInKong = [{
+                name: 'some_plugin'
+            }, {
+                name: 'some_plugin2'
+            }];
+
+            getPluginsStub.onCall(0).returns(Promise.resolve({
+                statusCode: 200,
+                body: {
+                    data: [pluginsInKong[0]],
+                    offset: 'some_offset'
+                }
+            }));
+
+            getPluginsStub.onCall(1).returns(Promise.resolve({
+                statusCode: 200,
+                body: {
+                    data: [pluginsInKong[1]]
+                }
+            }));
+
+            getPluginsStub.onCall(2).returns(Promise.resolve({
+                statusCode: 200,
+                body: {
+                    data: pluginsInKong
+                }
+            }));
+
+            createPluginStub.returns(Promise.resolve({
+                statusCode: 200,
+                body:{
+                    id: 200
+                }
+            }));
+
+            deletePluginStub.returns(Promise.resolve({
+                statusCode: 204
+            }));
+
+            return kongAPI.createPlugins(pluginsToCreate, null)
+                .then(() => {
+                    should(getPluginsStub.calledThrice).eql(true);
+                    should(createPluginStub.calledOnce).eql(true);
+                    should(deletePluginStub.calledTwice).eql(true);
+                    should(createPluginStub.calledWith(
+                        {
+                            url: url,
+                            apiId: null,
+                            body: {
+                                name: pluginsToCreate[0].name,
+                                config: pluginsToCreate[0].config
+                            }
+                        })).eql(true);
+                });
+
         });
 
         it('Should succeed if all succeeds and call create plugin multiple times', () => {
-            plugins = [
+            let pluginsToCreate = [
                 {
-                    name: plugin + '1'
+                    name: 'plugin1'
                 },
                 {
-                    name: plugin + '2'
+                    name: 'plugin2'
                 },
                 {
-                    name: plugin + '3'
+                    name: 'plugin3'
                 }
             ];
             getPluginsStub.returns(Promise.resolve({
@@ -204,11 +383,11 @@ describe('Kong API tests', () => {
                     id: 200
                 }
             }));
-            return kongAPI.createPlugins(plugins, apiName)
+
+            return kongAPI.createPlugins(pluginsToCreate, apiName)
                 .then(() => {
-                    should(getPluginsStub.calledOnce).eql(true);
                     should(createPluginStub.callCount).eql(3);
-                    for(let plugin of plugins){
+                    for(let plugin of pluginsToCreate) {
                         should(createPluginStub.calledWith({
                             url: url,
                             apiId: apiName,
@@ -217,83 +396,6 @@ describe('Kong API tests', () => {
                             }
                         })).eql(true);
                     }
-                });
-        });
-        it('Should succeed if all succeeds and plugin already exists', () => {
-            getPluginsStub.returns(Promise.resolve({
-                statusCode: 200,
-                body: {
-                    data:[{
-                        id: 'id',
-                        name: plugin
-                    }]
-                }
-            }));
-
-            createPluginStub.returns(Promise.resolve({
-                statusCode: 200,
-                body:{
-                    id: 'id'
-                }
-            }));
-            return kongAPI.createPlugins(plugins, apiName)
-            .then(() => {
-                should(getPluginsStub.calledOnce).eql(true);
-                should(createPluginStub.calledOnce).eql(true);
-                should(deletePluginStub.calledOnce).eql(false);
-                should(createPluginStub.calledWith({
-                    url: url,
-                    apiId: apiName,
-                    body: {
-                        id: 'id',
-                        name: plugin
-                    }
-                })).eql(true);
-            });
-        });
-        it('Should succeed if all succeeds and all plugins already exists except one and this plugin should be removed ', () => {
-            plugins = [
-                {
-                    name: plugin + '1'
-                }
-            ];
-
-            getPluginsStub.returns(Promise.resolve({
-                statusCode: 200,
-                body: {
-                    data:[{
-                        id: 'id',
-                        name: 'plugin-name1'
-                    }, {
-                        id: 'id2',
-                        name: 'plugin2'
-                    }]
-                }
-            }));
-
-            createPluginStub.returns(Promise.resolve({
-                statusCode: 200,
-                body:{
-                    id: 'id'
-                }
-            }));
-
-            deletePluginStub.returns(Promise.resolve({
-                statusCode: 204
-            }));
-            return kongAPI.createPlugins(plugins, apiName)
-                .then(() => {
-                    should(getPluginsStub.calledOnce).eql(true);
-                    should(createPluginStub.calledOnce).eql(true);
-                    should(deletePluginStub.calledOnce).eql(true);
-                    should(createPluginStub.calledWith({
-                        url: url,
-                        apiId: apiName,
-                        body: {
-                            id: 'id',
-                            name: 'plugin-name1'
-                        }
-                    })).eql(true);
                 });
         });
     });

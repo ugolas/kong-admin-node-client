@@ -3,7 +3,7 @@ let request = require('request-promise'),
     should = require('should'),
     sinon = require('sinon');
 
-describe.only('HTTP helper test', () => {
+describe('HTTP helper test', () => {
     let getStub, putStub, deleteStub;
     let sandbox;
     let url = 'url';
@@ -111,7 +111,7 @@ describe.only('HTTP helper test', () => {
             });
         });
     });
-    describe.only('When calling getAPI', () => {
+    describe('When calling getAPI', () => {
         beforeEach(() => {
             sandbox.resetHistory();
         });
@@ -142,12 +142,9 @@ describe.only('HTTP helper test', () => {
             return httpHelper.getAPI({
                 url: url,
                 apiName: name,
-                queryParams: [
-                    {
-                        key: 'key1',
-                        value: 'value1'
-                    }
-                ]
+                queryParams: {
+                    name: 'value'
+                }
             }).then(() => {
                 should(getStub.calledOnce).eql(true);
                 should(getStub.calledWith({
@@ -155,7 +152,10 @@ describe.only('HTTP helper test', () => {
                     resolveWithFullResponse: true,
                     json: true,
                     simple: false,
-                    uri: url + '/apis/' + name
+                    uri: url + '/apis/' + name,
+                    qs: {
+                        name: 'value'
+                    }
                 })).eql(true);
             });
         });
@@ -297,6 +297,35 @@ describe.only('HTTP helper test', () => {
                 })).eql(true);
             });
         });
+
+        it('Should succeed with all query params', () => {
+            getStub.returns(Promise.resolve({
+                statusCode: 200
+            }));
+
+            return httpHelper.getPlugins({
+                url: url,
+                apiId: name,
+                pluginName: 'some_name',
+                size: 10,
+                offset: 'some_offset'
+            }).then(() => {
+                should(getStub.calledOnce).eql(true);
+                should(getStub.calledWith({
+                    'content-type': 'application/json',
+                    resolveWithFullResponse: true,
+                    json: true,
+                    simple: false,
+                    uri: url + '/apis/' + name + '/plugins/',
+                    qs: {
+                        name: 'some_name',
+                        size: 10,
+                        offset: 'some_offset'
+                    }
+                })).eql(true);
+            });
+        });
+
         it('Should throw error if status code is wrong', () => {
             getStub.returns(Promise.resolve({
                 statusCode: 400

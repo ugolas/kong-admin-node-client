@@ -36,19 +36,11 @@ let getAPI = function ({ url, apiName, queryParams }) {
     };
 
     if (apiName) {
-        options.uri += `/${apiName}`
+        options.uri += `/${apiName}`;
     }
 
-    if (Array.isArray(queryParams)) {
-        let firstQueryParam = true;
-
-        queryParams.forEach((queryParam) => {
-            if (queryParam.key && queryParam.value) {
-                options.uri += firstQueryParam ? '?' : '&';
-                options.uri += `${queryParam.key}=${queryParam.value}`;
-                firstQueryParam = false;
-            }
-        })
+    if (queryParams) {
+        options.qs = queryParams
     }
 
     logger.info({ req: options }, 'getAPI');
@@ -75,14 +67,24 @@ let getPlugin = function ({ url, pluginName, apiId }) {
     return sendRequestAndProcessError(request.get, requestOptions, [200]);
 };
 
-let getPlugins = function ({ url, apiId }) {
+let getPlugins = function ({ url, apiId, pluginName, size, offset }) {
     let options = {
         uri: apiId ? `${url}/apis/${apiId}/plugins/` : `${url}/plugins/`
     };
+
+    let qs = {};
+
+    if (pluginName) qs.name = pluginName;
+    if (size) qs.size = size;
+    if (offset) qs.offset = offset;
+
+    if (Object.keys(qs).length > 0) {
+        options.qs = qs;
+    }
+
     logger.info({ req: options }, 'getPlugins');
     var requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.get, requestOptions, [200]);
-
 };
 
 let sendRequestAndProcessError = function (requestMethod, options, expectedStatuses) {
