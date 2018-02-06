@@ -208,6 +208,9 @@ async function getPluginsToDelete(kongAdminUrl, plugins, apiName) {
     let offset = undefined;
     let done = false;
 
+    // browse through the plugins list using pagination.
+    //  each page contains @size plugins. any plugin from kong that does not appear
+    // in the new plugins list will be mark as deleted
     while (!done) {
         let getPluginsRequest = {
             url : kongAdminUrl,
@@ -226,7 +229,9 @@ async function getPluginsToDelete(kongAdminUrl, plugins, apiName) {
                 }
             });
         } else {
-            // root level
+            // if @apiName is undefined then we search for root level plugins.
+            // kong will return all configured plugins for all apis.
+            // we will recognize root level plugin if the plugin does not have api_id property.
             getPluginsResponse.body.data.forEach((plugin) => {
                 if ( !plugin['api_id'] && ! _.find(plugins, x => x.name === plugin.name)) {
                     pluginsToDelete.push(plugin);
