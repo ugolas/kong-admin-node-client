@@ -347,4 +347,8 @@ describe('HTTP helper test', () => {
             });
         });
     });
+
+    describe('When calling deletePlugin', () => {
+
+    });
 });

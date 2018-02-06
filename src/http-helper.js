@@ -21,9 +21,9 @@ let deleteAPI = function ({ url, apiName }) {
     return sendRequestAndProcessError(request.delete, requestOptions, [204, 404]);
 };
 
-let deletePlugin = function ({url, apiName, pluginName}) {
+let deletePlugin = function ({url, apiName, pluginId}) {
     let options = {
-        uri: `${url}/apis/${apiName}/plugins/${pluginName}`
+        uri: `${url}/apis/${apiName}/plugins/${pluginId}`
     };
     logger.info({ req: options }, 'deletePlugin');
     let requestOptions = _.assign(options, basicRequest);

@@ -134,28 +134,29 @@ class KongAPI {
 
     async removePlugins(plugins, apiName) {
         logger.info(apiName ? `Removing plugins from kong api: ${apiName}. ${plugins.length} in total` : `Removing plugins from kong in root api. ${plugins.length} in total`);
-        for(let plugin in plugins) {
+        for (let i = 0; i < plugins.length; i++) {
+            let plugin = plugins[i];
             logger.info(`Removing plugin: ${plugin.name}, ${plugins.indexOf(plugin) + 1} out of ${plugins.length} plugins`);
 
             // Check if exists
             let removeResponse = await httpHelper.deletePlugin({
                 url: this.kongAdminUrl,
                 apiName: apiName,
-                pluginName: plugin.name
+                pluginId: plugin.id
             });
 
             if (removeResponse.statusCode === 404) {
                 logger.info(`API ${plugin.name} not found. Skipping it.`);
             }
 
-            logger.info(`Configuration for api: ${plugin.name} was removed successfully`);
+            logger.info(apiName ? `Removing plugin for api: ${apiName} was finished successfully. plugin name: ${plugin.name}` : `Removing plugin for root api was finished successfully. plugin name: ${plugin.name}`);
         }
     }
 
     async createPlugins(plugins, apiName) {
         logger.info(apiName ? `Setting up plugins in api: ${apiName}, ${plugins.length} in total` : `Setting up plugins, ${plugins.length} in total`);
 
-        let pluginsToDelete = await getPluginsToDelete(plugins, apiName);
+        let pluginsToDelete = await getPluginsToDelete(this.kongAdminUrl, plugins, apiName);
 
         // Create or update plugins
         for (let plugin of plugins) {
@@ -201,7 +202,7 @@ class KongAPI {
     }
 }
 
-async function getPluginsToDelete(plugins, apiName) {
+async function getPluginsToDelete(kongAdminUrl, plugins, apiName) {
     let pluginsToDelete = [];
 
     let offset = undefined;
@@ -209,7 +210,7 @@ async function getPluginsToDelete(plugins, apiName) {
 
     while (!done) {
         let getPluginsRequest = {
-            url : this.kongAdminUrl,
+            url : kongAdminUrl,
             size: 100
         };
 

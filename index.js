@@ -5,4 +5,4 @@ module.exports = kongAPI;
 
 process.on('unhandledRejection', (err) => {
     logger.error(err);
-})
+});
