@@ -138,7 +138,6 @@ class KongAPI {
             let plugin = plugins[i];
             logger.info(`Removing plugin: ${plugin.name}, ${plugins.indexOf(plugin) + 1} out of ${plugins.length} plugins`);
 
-            // Check if exists
             let removeResponse = await httpHelper.deletePlugin({
                 url: this.kongAdminUrl,
                 apiName: apiName,
