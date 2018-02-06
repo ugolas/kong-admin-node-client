@@ -134,6 +134,31 @@ describe('HTTP helper test', () => {
                 })).eql(true);
             });
         });
+        it('Should succeed if success with query params', () => {
+            getStub.returns(Promise.resolve({
+                statusCode: 200
+            }));
+
+            return httpHelper.getAPI({
+                url: url,
+                apiName: name,
+                queryParams: {
+                    name: 'value'
+                }
+            }).then(() => {
+                should(getStub.calledOnce).eql(true);
+                should(getStub.calledWith({
+                    'content-type': 'application/json',
+                    resolveWithFullResponse: true,
+                    json: true,
+                    simple: false,
+                    uri: url + '/apis/' + name,
+                    qs: {
+                        name: 'value'
+                    }
+                })).eql(true);
+            });
+        });
         it('Should throw error if status code is wrong', () => {
             getStub.returns(Promise.resolve({
                 statusCode: 400
@@ -272,6 +297,35 @@ describe('HTTP helper test', () => {
                 })).eql(true);
             });
         });
+
+        it('Should succeed with all query params', () => {
+            getStub.returns(Promise.resolve({
+                statusCode: 200
+            }));
+
+            return httpHelper.getPlugins({
+                url: url,
+                apiId: name,
+                pluginName: 'some_name',
+                size: 10,
+                offset: 'some_offset'
+            }).then(() => {
+                should(getStub.calledOnce).eql(true);
+                should(getStub.calledWith({
+                    'content-type': 'application/json',
+                    resolveWithFullResponse: true,
+                    json: true,
+                    simple: false,
+                    uri: url + '/apis/' + name + '/plugins/',
+                    qs: {
+                        name: 'some_name',
+                        size: 10,
+                        offset: 'some_offset'
+                    }
+                })).eql(true);
+            });
+        });
+
         it('Should throw error if status code is wrong', () => {
             getStub.returns(Promise.resolve({
                 statusCode: 400
@@ -292,5 +346,9 @@ describe('HTTP helper test', () => {
                 })).eql(true);
             });
         });
+    });
+
+    describe('When calling deletePlugin', () => {
+
     });
 });

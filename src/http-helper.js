@@ -21,13 +21,26 @@ let deleteAPI = function ({ url, apiName }) {
     return sendRequestAndProcessError(request.delete, requestOptions, [204, 404]);
 };
 
-let getAPI = function ({ url, apiName }) {
+let deletePlugin = function ({url, apiName, pluginId}) {
+    let options = {
+        uri: `${url}/apis/${apiName}/plugins/${pluginId}`
+    };
+    logger.info({ req: options }, 'deletePlugin');
+    let requestOptions = _.assign(options, basicRequest);
+    return sendRequestAndProcessError(request.delete, requestOptions, [204, 404]);
+};
+
+let getAPI = function ({ url, apiName, queryParams }) {
     let options = {
         uri: `${url}/apis`
     };
 
     if (apiName) {
         options.uri += `/${apiName}`;
+    }
+
+    if (queryParams) {
+        options.qs = queryParams
     }
 
     logger.info({ req: options }, 'getAPI');
@@ -54,15 +67,19 @@ let getPlugin = function ({ url, pluginName, apiId }) {
     return sendRequestAndProcessError(request.get, requestOptions, [200]);
 };
 
-let getPlugins = function ({ url, apiId, pluginName }) {
+let getPlugins = function ({ url, apiId, pluginName, size, offset }) {
     let options = {
         uri: apiId ? `${url}/apis/${apiId}/plugins/` : `${url}/plugins/`
     };
 
-    if (pluginName){
-        options.qs = {
-            name: pluginName
-        };
+    let qs = {};
+
+    if (pluginName) qs.name = pluginName;
+    if (size) qs.size = size;
+    if (offset) qs.offset = offset;
+
+    if (Object.keys(qs).length > 0) {
+        options.qs = qs;
     }
 
     logger.info({ req: options }, 'getPlugins');
@@ -96,5 +113,6 @@ module.exports = {
     deleteAPI: deleteAPI,
     createPlugin: createPlugin,
     getPlugin: getPlugin,
-    getPlugins: getPlugins
+    getPlugins: getPlugins,
+    deletePlugin: deletePlugin
 };
