@@ -409,6 +409,7 @@ describe('Kong API tests', () => {
                     kong_admin_api_url: url
                 }
             });
+
         });
         beforeEach(() => {
             sandbox.resetHistory();
@@ -418,7 +419,7 @@ describe('Kong API tests', () => {
             let plugin1 = {
                 name: "first plugin"
             };
-            getPluginsStub.returns(Promise.resolve({
+            getPluginsStub.onFirstCall().returns(Promise.resolve({
                 statusCode: 200,
                 body: {
                     data:[plugin1]
