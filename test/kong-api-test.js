@@ -400,7 +400,7 @@ describe('Kong API tests', () => {
         });
     });
 
-    describe('When calling getPluginsOfApi', () => {
+    describe('When calling getPluginsOfExistApi', () => {
         let kongAPI;
         let url = 'url', apiName = 'api';
         before(() => {
@@ -426,7 +426,7 @@ describe('Kong API tests', () => {
             }));
 
 
-            return kongAPI.getPluginsOfApi(apiName)
+            return kongAPI.getPluginsOfExistApi(apiName)
                 .then((res) => {
                     should(getPluginsStub.calledOnce).eql(true);
                     should(res).eql([plugin1]);
@@ -455,7 +455,7 @@ describe('Kong API tests', () => {
             }));
 
 
-            return kongAPI.getPluginsOfApi(apiName)
+            return kongAPI.getPluginsOfExistApi(apiName)
                 .then((res) => {
                     should(getPluginsStub.calledTwice).eql(true);
                     should(res).eql([plugin1,plugin2]);

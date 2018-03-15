@@ -200,7 +200,7 @@ class KongAPI {
         }
     }
 
-    async getPluginsOfApi(apiName) {
+    async getPluginsOfExistApi(apiName) {
         if (apiName) {
             let plugins = [];
 
