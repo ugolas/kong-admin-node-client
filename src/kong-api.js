@@ -89,7 +89,7 @@ class KongAPI {
             return getResponse;
         }
 
-        for(let i = 0; i < apis.length; i++) {
+        for (let i = 0; i < apis.length; i++) {
             let api = apis[i];
 
             if (!api.name) {
@@ -199,6 +199,43 @@ class KongAPI {
             await this.removePlugins(pluginsToDelete, apiName);
         }
     }
+
+    async getPluginsOfApi(apiName) {
+        if (apiName) {
+            let plugins = [];
+
+            let offset = undefined;
+            let done = false;
+
+            // browse through the plugins list using pagination.
+            //  each page contains @size plugins. any plugin from kong that does not appear
+            // in the new plugins list will be mark as deleted
+            while (!done) {
+                let getPluginsRequest = {
+                    url: this.kongAdminUrl,
+                    size: 100
+                };
+
+                getPluginsRequest.apiId = apiName;
+                getPluginsRequest.offset = offset;
+
+                let getPluginsResponse = await httpHelper.getPlugins(getPluginsRequest);
+
+                getPluginsResponse.body.data.forEach((plugin) => {
+                    plugins.push(plugin);
+                });
+
+
+                offset = getPluginsResponse.body.offset;
+
+                if (!offset) {
+                    done = true;
+                }
+            }
+
+            return plugins;
+        }
+    }
 }
 
 async function getPluginsToDelete(kongAdminUrl, plugins, apiName) {
@@ -212,18 +249,19 @@ async function getPluginsToDelete(kongAdminUrl, plugins, apiName) {
     // in the new plugins list will be mark as deleted
     while (!done) {
         let getPluginsRequest = {
-            url : kongAdminUrl,
+            url: kongAdminUrl,
             size: 100
         };
 
         if (apiName) getPluginsRequest.apiId = apiName;
         getPluginsRequest.offset = offset;
 
-        let getPluginsResponse = await httpHelper.getPlugins(getPluginsRequest);
+        let getPluginsResponse = await
+            httpHelper.getPlugins(getPluginsRequest);
 
         if (apiName) {
             getPluginsResponse.body.data.forEach((plugin) => {
-                if( ! _.find(plugins, x => x.name === plugin.name)) {
+                if (!_.find(plugins, x => x.name === plugin.name)) {
                     pluginsToDelete.push(plugin);
                 }
             });
@@ -232,7 +270,7 @@ async function getPluginsToDelete(kongAdminUrl, plugins, apiName) {
             // kong will return all configured plugins for all apis.
             // we will recognize root level plugin if the plugin does not have api_id property.
             getPluginsResponse.body.data.forEach((plugin) => {
-                if ( !plugin['api_id'] && ! _.find(plugins, x => x.name === plugin.name)) {
+                if (!plugin['api_id'] && !_.find(plugins, x => x.name === plugin.name)) {
                     pluginsToDelete.push(plugin);
                 }
             });
@@ -248,4 +286,5 @@ async function getPluginsToDelete(kongAdminUrl, plugins, apiName) {
     return pluginsToDelete;
 }
 
-module.exports = KongAPI;
+module
+    .exports = KongAPI;
