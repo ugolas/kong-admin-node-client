@@ -400,6 +400,73 @@ describe('Kong API tests', () => {
         });
     });
 
+    describe('When calling getPluginsOfExistApi', () => {
+        let kongAPI;
+        let url = 'url', apiName = 'api';
+        before(() => {
+            kongAPI = new KongAPI({
+                kong_config: {
+                    kong_admin_api_url: url
+                }
+            });
+
+        });
+        beforeEach(() => {
+            sandbox.resetHistory();
+        });
+
+        it('Should succeed and get plugins', () => {
+            let plugin1 = {
+                name: "first plugin"
+            };
+            getPluginsStub.onFirstCall().returns(Promise.resolve({
+                statusCode: 200,
+                body: {
+                    data:[plugin1]
+                }
+            }));
+
+
+            return kongAPI.getPluginsOfExistApi(apiName)
+                .then((res) => {
+                    should(getPluginsStub.calledOnce).eql(true);
+                    should(res).eql([plugin1]);
+                    should(getPluginsStub.args[0][0]).eql({url: 'url', size: 100, apiId: 'api', offset: undefined})
+                });
+        });
+        it('Should succeed and get plugins with offest', () => {
+            let plugin1 = {
+                name: "first plugin"
+            };
+            let plugin2 = {
+                name: "second plugin"
+            };
+            getPluginsStub.onFirstCall().returns(Promise.resolve({
+                statusCode: 200,
+                body: {
+                    data: [plugin1],
+                    offset: 'some_offset'
+                }
+            }));
+            getPluginsStub.onSecondCall().returns(Promise.resolve({
+                statusCode: 200,
+                body: {
+                    data: [plugin2]
+                }
+            }));
+
+
+            return kongAPI.getPluginsOfExistApi(apiName)
+                .then((res) => {
+                    should(getPluginsStub.calledTwice).eql(true);
+                    should(res).eql([plugin1,plugin2]);
+                    should(getPluginsStub.args[0][0]).eql({url: 'url', size: 100, apiId: 'api', offset: undefined});
+                    should(getPluginsStub.args[1][0]).eql({url: 'url', size: 100, apiId: 'api', offset: "some_offset"});
+                });
+        });
+
+    });
+
     describe('When calling createApis', () => {
         let kongAPI;
         let apis;
@@ -577,7 +644,6 @@ describe('Kong API tests', () => {
             });
         });
     });
-
 
     describe('When calling getAPIS', () => {
         let kongAPI;
