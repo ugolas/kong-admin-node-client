@@ -67,8 +67,8 @@ class KongAPI {
                 url: this.kongAdminUrl,
                 body: api,
             };
-            let response = await httpHelper.createAPI(createApiRequest);
             createApiRequest = addSessionTokenToRequest(this.sessionToken, createApiRequest)
+            let response = await httpHelper.createAPI(createApiRequest);
 
             let apiId = response.body.id;
             logger.info(`Configuration for api: ${api.name} set up successfully: ${apiId}`);
