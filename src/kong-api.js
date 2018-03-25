@@ -4,8 +4,8 @@ let httpHelper = require('./http-helper'),
 
 class KongAPI {
     constructor(options) {
-        if (!options.kong_config || !options.kong_config.kong_admin_api_url || !options.kong_config.session_token) {
-            throw new Error('kong_config & kong_config.kong_admin_api_url & kong_config.session_token is mandatory');
+        if (!options.kong_config || !options.kong_config.kong_admin_api_url) {
+            throw new Error('kong_config & kong_config.kong_admin_api_url is mandatory');
         }
         this.kong_config = options.kong_config;
         this.sessionToken = options.session_token;
