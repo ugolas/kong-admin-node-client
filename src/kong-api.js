@@ -8,7 +8,7 @@ class KongAPI {
             throw new Error('kong_config & kong_config.kong_admin_api_url is mandatory');
         }
         this.kong_config = options.kong_config;
-        this.sessionToken = options.kong_config.session_token;
+        this.sessionToken = options.session_token;
         this.kongAdminUrl = this.kong_config.kong_admin_api_url;
     }
 

@@ -52,8 +52,8 @@ describe('Kong API tests', () => {
             kongAPI = new KongAPI({
                 kong_config: {
                     kong_admin_api_url: url,
-                    session_token: "sessionToken"
-                }
+                },
+                session_token: "sessionToken"
             });
 
             apis = [{
