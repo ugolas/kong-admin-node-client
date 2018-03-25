@@ -8,6 +8,7 @@ class KongAPI {
             throw new Error('kong_config & kong_config.kong_admin_api_url is mandatory');
         }
         this.kong_config = options.kong_config;
+        this.sessionToken = options.session_token;
         this.kongAdminUrl = this.kong_config.kong_admin_api_url;
     }
 
@@ -47,7 +48,10 @@ class KongAPI {
             // Check if exists
             let getResponse = await httpHelper.getAPI({
                 url: this.kongAdminUrl,
-                apiName: api.name
+                apiName: api.name,
+                headers:{
+                    Authorization: `Bearer ${this.sessionToken}`
+                }
             });
 
             // If API exists
@@ -59,7 +63,10 @@ class KongAPI {
 
             let response = await httpHelper.createAPI({
                 url: this.kongAdminUrl,
-                body: api
+                body: api,
+                headers:{
+                    Authorization: `Bearer ${this.sessionToken}`
+                }
             });
             let apiId = response.body.id;
             logger.info(`Configuration for api: ${api.name} set up successfully: ${apiId}`);
@@ -79,7 +86,10 @@ class KongAPI {
             // Get all configured API's
             let response = await httpHelper.getAPI({
                 url: this.kongAdminUrl,
-                queryParams: options && typeof options === 'object' && options.queryParams
+                queryParams: options && typeof options === 'object' && options.queryParams,
+                headers:{
+                    Authorization: `Bearer ${this.sessionToken}`
+                }
             });
 
             if (response.statusCode === 200) {
@@ -102,7 +112,10 @@ class KongAPI {
 
             let response = await httpHelper.getAPI({
                 url: this.kongAdminUrl,
-                apiName: api.name
+                apiName: api.name,
+                headers:{
+                    Authorization: `Bearer ${this.sessionToken}`
+                }
             });
 
             if (response.statusCode === 200) {
@@ -121,7 +134,10 @@ class KongAPI {
             // Check if exists
             let removeResponse = await httpHelper.deleteAPI({
                 url: this.kongAdminUrl,
-                apiName: api.name
+                apiName: api.name,
+                headers:{
+                    Authorization: `Bearer ${this.sessionToken}`
+                }
             });
 
             if (removeResponse.statusCode === 404) {
@@ -141,7 +157,10 @@ class KongAPI {
             let removeResponse = await httpHelper.deletePlugin({
                 url: this.kongAdminUrl,
                 apiName: apiName,
-                pluginId: plugin.id
+                pluginId: plugin.id,
+                headers:{
+                    Authorization: `Bearer ${this.sessionToken}`
+                }
             });
 
             if (removeResponse.statusCode === 404) {
@@ -165,7 +184,10 @@ class KongAPI {
             let getPluginsResponse = await httpHelper.getPlugins({
                 url: this.kongAdminUrl,
                 apiId: apiName,
-                pluginName: plugin.name
+                pluginName: plugin.name,
+                headers:{
+                    Authorization: `Bearer ${this.sessionToken}`
+                }
             });
 
             let existingPlugins = getPluginsResponse.body.data;
@@ -188,7 +210,10 @@ class KongAPI {
             let response = await httpHelper.createPlugin({
                 url: this.kongAdminUrl,
                 apiId: apiName,
-                body: plugin
+                body: plugin,
+                headers:{
+                    Authorization: `Bearer ${this.sessionToken}`
+                }
             });
 
             logger.info(`Configuration for plugin: ${plugin.name} set up successfully: ${response.body.id}`);
@@ -213,7 +238,10 @@ class KongAPI {
             while (!done) {
                 let getPluginsRequest = {
                     url: this.kongAdminUrl,
-                    size: 100
+                    size: 100,
+                    headers:{
+                        Authorization: `Bearer ${this.sessionToken}`
+                    }
                 };
 
                 getPluginsRequest.apiId = apiName;
@@ -250,7 +278,10 @@ async function getPluginsToDelete(kongAdminUrl, plugins, apiName) {
     while (!done) {
         let getPluginsRequest = {
             url: kongAdminUrl,
-            size: 100
+            size: 100,
+            headers:{
+                Authorization: `Bearer ${this.sessionToken}`
+            }
         };
 
         if (apiName) getPluginsRequest.apiId = apiName;

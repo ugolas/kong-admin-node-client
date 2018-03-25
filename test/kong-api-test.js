@@ -1,4 +1,3 @@
-
 let httpHelper = require('../src/http-helper'),
     KongAPI = require('../src/kong-api'),
     should = require('should'),
@@ -40,7 +39,7 @@ describe('Kong API tests', () => {
 
         it('Should not throw error if kong_admin_api_url exists', () => {
             let url = 'some-url';
-            let kongAPI = new KongAPI({kong_config: { kong_admin_api_url: url }});
+            let kongAPI = new KongAPI({kong_config: {kong_admin_api_url: url}});
             should(kongAPI.kongAdminUrl).eql(url);
         });
     });
@@ -69,13 +68,13 @@ describe('Kong API tests', () => {
             }));
 
             return kongAPI.removeAPIs(apis)
-            .then(() => {
-                should(deleteAPIStub.calledOnce).eql(true);
-                should(deleteAPIStub.calledWith({
-                    url: url,
-                    apiName: apiName
-                }));
-            });
+                .then(() => {
+                    should(deleteAPIStub.calledOnce).eql(true);
+                    should(deleteAPIStub.calledWith({
+                        url: url,
+                        apiName: apiName
+                    }));
+                });
         });
         it('Should succeed if all succeeds and call remove api multiple times', () => {
             apis = [
@@ -96,15 +95,18 @@ describe('Kong API tests', () => {
             }));
 
             return kongAPI.removeAPIs(apis)
-            .then(() => {
-                should(deleteAPIStub.callCount).eql(3);
-                for(let api of apis){
-                    should(deleteAPIStub.calledWith({
-                        url: url,
-                        apiName: api.name
-                    })).eql(true);
-                }
-            });
+                .then(() => {
+                    should(deleteAPIStub.callCount).eql(3);
+                    for (let api of apis) {
+                        should(deleteAPIStub.calledWith({
+                            url: url,
+                            apiName: api.name,
+                            headers: {
+                                "Authorization": "Bearer undefined"
+                            }
+                        })).eql(true);
+                    }
+                });
 
         });
         it('Should succeed if apis is empty array', () => {
@@ -113,9 +115,9 @@ describe('Kong API tests', () => {
             }));
 
             return kongAPI.removeAPIs([])
-            .then(() => {
-                should(deleteAPIStub.callCount).eql(0);
-            });
+                .then(() => {
+                    should(deleteAPIStub.callCount).eql(0);
+                });
 
         });
         it('Should throw error if api is corrupted', () => {
@@ -126,9 +128,9 @@ describe('Kong API tests', () => {
             return kongAPI.removeAPIs([{
                 name1: 'name'
             }])
-            .then(() => {
-                should(deleteAPIStub.callCount).eql(1);
-            });
+                .then(() => {
+                    should(deleteAPIStub.callCount).eql(1);
+                });
 
         });
     });
@@ -156,12 +158,12 @@ describe('Kong API tests', () => {
             getPluginsStub.returns(Promise.resolve({
                 statusCode: 200,
                 body: {
-                    data:[]
+                    data: []
                 }
             }));
             createPluginStub.returns(Promise.resolve({
                 statusCode: 200,
-                body:{
+                body: {
                     id: 200
                 }
             }));
@@ -178,6 +180,9 @@ describe('Kong API tests', () => {
                             body: {
                                 name: pluginsToCreate[0].name,
                                 config: pluginsToCreate[0].config
+                            },
+                            headers: {
+                                "Authorization": "Bearer undefined"
                             }
                         })).eql(true);
                 });
@@ -203,7 +208,7 @@ describe('Kong API tests', () => {
 
             createPluginStub.returns(Promise.resolve({
                 statusCode: 200,
-                body:{
+                body: {
                     id: 200
                 }
             }));
@@ -224,6 +229,9 @@ describe('Kong API tests', () => {
                             body: {
                                 name: pluginsToCreate[0].name,
                                 config: pluginsToCreate[0].config
+                            },
+                            headers: {
+                                "Authorization": "Bearer undefined"
                             }
                         })).eql(true);
                 });
@@ -268,7 +276,7 @@ describe('Kong API tests', () => {
 
             createPluginStub.returns(Promise.resolve({
                 statusCode: 200,
-                body:{
+                body: {
                     id: 200
                 }
             }));
@@ -289,6 +297,9 @@ describe('Kong API tests', () => {
                             body: {
                                 name: pluginsToCreate[0].name,
                                 config: pluginsToCreate[0].config
+                            },
+                            headers: {
+                                "Authorization": "Bearer undefined"
                             }
                         })).eql(true);
                 });
@@ -331,7 +342,7 @@ describe('Kong API tests', () => {
 
             createPluginStub.returns(Promise.resolve({
                 statusCode: 200,
-                body:{
+                body: {
                     id: 200
                 }
             }));
@@ -352,6 +363,9 @@ describe('Kong API tests', () => {
                             body: {
                                 name: pluginsToCreate[0].name,
                                 config: pluginsToCreate[0].config
+                            },
+                            headers: {
+                                "Authorization": "Bearer undefined"
                             }
                         })).eql(true);
                 });
@@ -373,13 +387,13 @@ describe('Kong API tests', () => {
             getPluginsStub.returns(Promise.resolve({
                 statusCode: 200,
                 body: {
-                    data:[]
+                    data: []
                 }
             }));
 
             createPluginStub.returns(Promise.resolve({
                 statusCode: 200,
-                body:{
+                body: {
                     id: 200
                 }
             }));
@@ -387,12 +401,15 @@ describe('Kong API tests', () => {
             return kongAPI.createPlugins(pluginsToCreate, apiName)
                 .then(() => {
                     should(createPluginStub.callCount).eql(3);
-                    for(let plugin of pluginsToCreate) {
+                    for (let plugin of pluginsToCreate) {
                         should(createPluginStub.calledWith({
                             url: url,
                             apiId: apiName,
                             body: {
                                 name: plugin.name
+                            },
+                            headers: {
+                                "Authorization": "Bearer undefined"
                             }
                         })).eql(true);
                     }
@@ -422,7 +439,10 @@ describe('Kong API tests', () => {
             getPluginsStub.onFirstCall().returns(Promise.resolve({
                 statusCode: 200,
                 body: {
-                    data:[plugin1]
+                    data: [plugin1]
+                },
+                headers: {
+                    "Authorization": "Bearer undefined"
                 }
             }));
 
@@ -431,7 +451,12 @@ describe('Kong API tests', () => {
                 .then((res) => {
                     should(getPluginsStub.calledOnce).eql(true);
                     should(res).eql([plugin1]);
-                    should(getPluginsStub.args[0][0]).eql({url: 'url', size: 100, apiId: 'api', offset: undefined})
+                    should(getPluginsStub.args[0][0]).eql({
+                        url: 'url', size: 100, apiId: 'api', offset: undefined,
+                        headers: {
+                            "Authorization": "Bearer undefined"
+                        }
+                    })
                 });
         });
         it('Should succeed and get plugins with offest', () => {
@@ -452,6 +477,9 @@ describe('Kong API tests', () => {
                 statusCode: 200,
                 body: {
                     data: [plugin2]
+                },
+                headers: {
+                    "Authorization": "Bearer undefined"
                 }
             }));
 
@@ -459,9 +487,15 @@ describe('Kong API tests', () => {
             return kongAPI.getPluginsOfExistApi(apiName)
                 .then((res) => {
                     should(getPluginsStub.calledTwice).eql(true);
-                    should(res).eql([plugin1,plugin2]);
-                    should(getPluginsStub.args[0][0]).eql({url: 'url', size: 100, apiId: 'api', offset: undefined});
-                    should(getPluginsStub.args[1][0]).eql({url: 'url', size: 100, apiId: 'api', offset: "some_offset"});
+                    should(res).eql([plugin1, plugin2]);
+                    should(getPluginsStub.args[0][0]).eql({url: 'url', size: 100, apiId: 'api', offset: undefined,
+                        headers: {
+                            "Authorization": "Bearer undefined"
+                        }});
+                    should(getPluginsStub.args[1][0]).eql({url: 'url', size: 100, apiId: 'api', offset: "some_offset",
+                        headers: {
+                            "Authorization": "Bearer undefined"
+                        }});
                 });
         });
 
@@ -495,70 +529,76 @@ describe('Kong API tests', () => {
             getPluginsStub.returns(Promise.resolve({
                 statusCode: 200,
                 body: {
-                    data:[]
+                    data: []
                 }
             }));
             createAPIStub.returns(Promise.resolve({
                 statusCode: 200,
-                body:{
+                body: {
                     id: 'id'
                 }
             }));
             createPluginStub.returns(Promise.resolve({
                 statusCode: 200,
-                body:{
+                body: {
                     id: 'id'
                 }
             }));
             return kongAPI.createApis(apis)
-            .then(() => {
-                should(createAPIStub.calledOnce).eql(true);
-                should(createPluginStub.calledOnce).eql(true);
-                should(createAPIStub.calledWith({
-                    url: url,
-                    body:{
-                        name: api
-                    }
-                })).eql(true);
-            });
+                .then(() => {
+                    should(createAPIStub.calledOnce).eql(true);
+                    should(createPluginStub.calledOnce).eql(true);
+                    should(createAPIStub.calledWith({
+                        url: url,
+                        body: {
+                            name: api
+                        },
+                        headers: {
+                            "Authorization": "Bearer undefined"
+                        }
+                    })).eql(true);
+                });
         });
         it('Should succeed if all succeeds and api already exists', () => {
             getAPIStub.returns(Promise.resolve({
                 statusCode: 200, // found,
-                body:{
+                body: {
                     id: 'api-id'
                 }
             }));
             getPluginsStub.returns(Promise.resolve({
                 statusCode: 200,
                 body: {
-                    data:[]
+                    data: []
                 }
             }));
             createAPIStub.returns(Promise.resolve({
                 statusCode: 200,
-                body:{
+                body: {
                     id: 'id'
                 }
             }));
             createPluginStub.returns(Promise.resolve({
                 statusCode: 200,
-                body:{
+                body: {
                     id: 'id'
                 }
             }));
             return kongAPI.createApis(apis)
-            .then(() => {
-                should(createAPIStub.calledOnce).eql(true);
-                should(createPluginStub.calledOnce).eql(true);
-                should(createAPIStub.calledWith({
-                    url: url,
-                    body:{
-                        id: 'api-id',
-                        name: api
-                    }
-                })).eql(true);
-            });
+                .then(() => {
+                    should(createAPIStub.calledOnce).eql(true);
+                    should(createPluginStub.calledOnce).eql(true);
+                    should(createAPIStub.calledWith({
+                        url: url,
+                        body: {
+                            id: 'api-id',
+                            name: api
+                        },
+                        headers: {
+                            "Authorization": "Bearer undefined"
+                        }
+                    })).eql(true);
+                });
         });
     });
 
@@ -573,7 +613,7 @@ describe('Kong API tests', () => {
                     kong_admin_api_url: url,
                     apis: [{
                         name: api,
-                        plugins:[{
+                        plugins: [{
                             name: plugin
                         }]
                     }],
@@ -595,27 +635,27 @@ describe('Kong API tests', () => {
             getPluginsStub.returns(Promise.resolve({
                 statusCode: 200,
                 body: {
-                    data:[]
+                    data: []
                 }
             }));
             createAPIStub.returns(Promise.resolve({
                 statusCode: 200,
-                body:{
+                body: {
                     id: 'id'
                 }
             }));
             createPluginStub.returns(Promise.resolve({
                 statusCode: 200,
-                body:{
+                body: {
                     id: 'id'
                 }
             }));
 
             return kongAPI.createConfigurations()
-            .then(()=>{
-                should(createAPIStub.callCount).eql(1);
-                should(createPluginStub.callCount).eql(2);
-            });
+                .then(() => {
+                    should(createAPIStub.callCount).eql(1);
+                    should(createPluginStub.callCount).eql(2);
+                });
         });
 
         it('Should throw error if one of the requests fails', () => {
@@ -625,23 +665,23 @@ describe('Kong API tests', () => {
             getPluginsStub.returns(Promise.resolve({
                 statusCode: 200,
                 body: {
-                    data:[]
+                    data: []
                 }
             }));
             createAPIStub.returns(Promise.resolve({
                 statusCode: 200,
-                body:{
+                body: {
                     id: 'id'
                 }
             }));
             createPluginStub.rejects(new Error('error'));
 
             return kongAPI.createConfigurations()
-            .then(()=>{
-                should.fail('Expected to throw error');
-            }).catch((err) => {
-                should(err).eql(new Error('error'));
-            });
+                .then(() => {
+                    should.fail('Expected to throw error');
+                }).catch((err) => {
+                    should(err).eql(new Error('error'));
+                });
         });
     });
 
@@ -679,7 +719,10 @@ describe('Kong API tests', () => {
                     should(getAPIStub.calledOnce).eql(true);
                     should(getAPIStub.calledWith({
                         url: url,
-                        queryParams: undefined
+                        queryParams: undefined,
+                        headers: {
+                            "Authorization": "Bearer undefined"
+                        }
                     })).eql(true);
                     should(response.length).eql(2);
                     should(response[0].name).eql('api1');
@@ -705,7 +748,10 @@ describe('Kong API tests', () => {
                     should(getAPIStub.calledOnce).eql(true);
                     should(getAPIStub.calledWith({
                         url: url,
-                        queryParams: 'queryParams'
+                        queryParams: 'queryParams',
+                        headers: {
+                            "Authorization": "Bearer undefined"
+                        }
                     })).eql(true);
                     should(response.length).eql(2);
                     should(response[0].name).eql('api1');

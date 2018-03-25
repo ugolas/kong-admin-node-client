@@ -32,7 +32,10 @@ describe('HTTP helper test', () => {
 
             return httpHelper.createAPI({
                 url: url,
-                body: sampleBody
+                body: sampleBody,
+                headers: {
+                    "Authorization": "Bearer try"
+                }
             }).then(() => {
                 should(putStub.calledOnce).eql(true);
                 should(putStub.calledWith({
@@ -41,7 +44,10 @@ describe('HTTP helper test', () => {
                     json: true,
                     simple: false,
                     uri: url + '/apis',
-                    body: sampleBody
+                    body: sampleBody,
+                    headers: {
+                        "Authorization": "Bearer try"
+                    }
                 })).eql(true);
             });
         });
@@ -62,7 +68,8 @@ describe('HTTP helper test', () => {
                     json: true,
                     simple: false,
                     uri: url + '/apis',
-                    body: sampleBody
+                    body: sampleBody,
+                    headers: undefined
                 })).eql(true);
             });
         });
@@ -78,7 +85,10 @@ describe('HTTP helper test', () => {
 
             return httpHelper.deleteAPI({
                 url: url,
-                apiName: name
+                apiName: name,
+                headers: {
+                    "Authorization": "Bearer try"
+                }
             }).then(() => {
                 should(deleteStub.calledOnce).eql(true);
                 should(deleteStub.calledWith({
@@ -86,7 +96,10 @@ describe('HTTP helper test', () => {
                     resolveWithFullResponse: true,
                     json: true,
                     simple: false,
-                    uri: url + '/apis/' + name
+                    uri: url + '/apis/' + name,
+                    headers: {
+                        "Authorization": "Bearer try"
+                    }
                 })).eql(true);
             });
         });
@@ -97,7 +110,10 @@ describe('HTTP helper test', () => {
 
             return httpHelper.deleteAPI({
                 url: url,
-                apiName: name
+                apiName: name,
+                headers: {
+                    "Authorization": "Bearer try"
+                }
             }).catch((err) => {
                 should(err).eql(new Error('Error in calling url/apis/name'));
                 should(deleteStub.calledOnce).eql(true);
@@ -106,7 +122,10 @@ describe('HTTP helper test', () => {
                     resolveWithFullResponse: true,
                     json: true,
                     simple: false,
-                    uri: url + '/apis/' + name
+                    uri: url + '/apis/' + name,
+                    headers: {
+                        "Authorization": "Bearer try"
+                    }
                 })).eql(true);
             });
         });
@@ -122,7 +141,10 @@ describe('HTTP helper test', () => {
 
             return httpHelper.getAPI({
                 url: url,
-                apiName: name
+                apiName: name,
+                headers: {
+                    "Authorization": "Bearer try"
+                }
             }).then(() => {
                 should(getStub.calledOnce).eql(true);
                 should(getStub.calledWith({
@@ -130,7 +152,10 @@ describe('HTTP helper test', () => {
                     resolveWithFullResponse: true,
                     json: true,
                     simple: false,
-                    uri: url + '/apis/' + name
+                    uri: url + '/apis/' + name,
+                    headers: {
+                        "Authorization": "Bearer try"
+                    }
                 })).eql(true);
             });
         });
@@ -155,7 +180,8 @@ describe('HTTP helper test', () => {
                     uri: url + '/apis/' + name,
                     qs: {
                         name: 'value'
-                    }
+                    },
+                    headers: undefined
                 })).eql(true);
             });
         });
@@ -175,7 +201,8 @@ describe('HTTP helper test', () => {
                     resolveWithFullResponse: true,
                     json: true,
                     simple: false,
-                    uri: url + '/apis/' + name
+                    uri: url + '/apis/' + name,
+                    headers: undefined
                 })).eql(true);
             });
         });
@@ -192,7 +219,10 @@ describe('HTTP helper test', () => {
             return httpHelper.createPlugin({
                 url: url,
                 apiId: name,
-                body: sampleBody
+                body: sampleBody,
+                headers: {
+                    "Authorization": "Bearer try"
+                }
             }).then(() => {
                 should(putStub.calledOnce).eql(true);
                 should(putStub.calledWith({
@@ -201,7 +231,10 @@ describe('HTTP helper test', () => {
                     json: true,
                     simple: false,
                     uri: url + '/apis/' + name + '/plugins',
-                    body: sampleBody
+                    body: sampleBody,
+                    headers: {
+                        "Authorization": "Bearer try"
+                    }
                 })).eql(true);
             });
         });
@@ -223,7 +256,8 @@ describe('HTTP helper test', () => {
                     json: true,
                     simple: false,
                     uri: url + '/apis/' + name + '/plugins',
-                    body: sampleBody
+                    body: sampleBody,
+                    headers: undefined
                 })).eql(true);
             });
         });
@@ -240,7 +274,10 @@ describe('HTTP helper test', () => {
             return httpHelper.getPlugin({
                 url: url,
                 pluginName: name,
-                apiId: name
+                apiId: name,
+                headers: {
+                    "Authorization": "Bearer try"
+                }
             }).then(() => {
                 should(getStub.calledOnce).eql(true);
                 should(getStub.calledWith({
@@ -248,7 +285,10 @@ describe('HTTP helper test', () => {
                     resolveWithFullResponse: true,
                     json: true,
                     simple: false,
-                    uri: url + '/apis/' + name + '/plugins/' + name
+                    uri: url + '/apis/' + name + '/plugins/' + name,
+                    headers: {
+                        "Authorization": "Bearer try"
+                    }
                 })).eql(true);
             });
         });
@@ -269,7 +309,8 @@ describe('HTTP helper test', () => {
                     resolveWithFullResponse: true,
                     json: true,
                     simple: false,
-                    uri: url + '/apis/' + name + '/plugins/' + name
+                    uri: url + '/apis/' + name + '/plugins/' + name,
+                    headers: undefined
                 })).eql(true);
             });
         });
@@ -285,7 +326,10 @@ describe('HTTP helper test', () => {
 
             return httpHelper.getPlugins({
                 url: url,
-                apiId: name
+                apiId: name,
+                headers: {
+                    "Authorization": "Bearer try"
+                }
             }).then(() => {
                 should(getStub.calledOnce).eql(true);
                 should(getStub.calledWith({
@@ -293,7 +337,10 @@ describe('HTTP helper test', () => {
                     resolveWithFullResponse: true,
                     json: true,
                     simple: false,
-                    uri: url + '/apis/' + name + '/plugins/'
+                    uri: url + '/apis/' + name + '/plugins/',
+                    headers: {
+                        "Authorization": "Bearer try"
+                    }
                 })).eql(true);
             });
         });
@@ -321,7 +368,8 @@ describe('HTTP helper test', () => {
                         name: 'some_name',
                         size: 10,
                         offset: 'some_offset'
-                    }
+                    },
+                    headers: undefined
                 })).eql(true);
             });
         });
@@ -342,7 +390,8 @@ describe('HTTP helper test', () => {
                     resolveWithFullResponse: true,
                     json: true,
                     simple: false,
-                    uri: url + '/apis/' + name + '/plugins/'
+                    uri: url + '/apis/' + name + '/plugins/',
+                    headers: undefined
                 })).eql(true);
             });
         });

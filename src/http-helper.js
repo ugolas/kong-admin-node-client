@@ -2,37 +2,41 @@ let _ = require('lodash'),
     logger = require('./logger'),
     request = require('request-promise');
 
-let createAPI = function ({ url, body }) {
+let createAPI = function ({url, body, headers}) {
     let options = {
         uri: `${url}/apis`,
-        body: body
+        body: body,
+        headers: headers
     };
-    logger.info({ req: options }, 'createAPI');
+    logger.info({req: options}, 'createAPI');
     var requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.put, requestOptions, [200, 201]);
 };
 
-let deleteAPI = function ({ url, apiName }) {
+let deleteAPI = function ({url, apiName, headers}) {
     let options = {
-        uri: `${url}/apis/${apiName}`
+        uri: `${url}/apis/${apiName}`,
+        headers: headers
     };
-    logger.info({ req: options }, 'deleteAPI');
+    logger.info({req: options}, 'deleteAPI');
     var requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.delete, requestOptions, [204, 404]);
 };
 
-let deletePlugin = function ({url, apiName, pluginId}) {
+let deletePlugin = function ({url, apiName, pluginId, headers}) {
     let options = {
-        uri: `${url}/apis/${apiName}/plugins/${pluginId}`
+        uri: `${url}/apis/${apiName}/plugins/${pluginId}`,
+        headers: headers
     };
-    logger.info({ req: options }, 'deletePlugin');
+    logger.info({req: options}, 'deletePlugin');
     let requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.delete, requestOptions, [204, 404]);
 };
 
-let getAPI = function ({ url, apiName, queryParams }) {
+let getAPI = function ({url, apiName, queryParams, headers}) {
     let options = {
-        uri: `${url}/apis`
+        uri: `${url}/apis`,
+        headers: headers
     };
 
     if (apiName) {
@@ -43,33 +47,36 @@ let getAPI = function ({ url, apiName, queryParams }) {
         options.qs = queryParams
     }
 
-    logger.info({ req: options }, 'getAPI');
+    logger.info({req: options}, 'getAPI');
     let requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.get, requestOptions, [200, 404]);
 };
 
-let createPlugin = function ({ url, apiId, body }) {
+let createPlugin = function ({url, apiId, body, headers}) {
     let options = {
         uri: apiId ? `${url}/apis/${apiId}/plugins` : `${url}/plugins`,
-        body: body
+        body: body,
+        headers: headers
     };
-    logger.info({ req: options }, 'createPlugin');
+    logger.info({req: options}, 'createPlugin');
     var requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.put, requestOptions, [200, 201]);
 };
 
-let getPlugin = function ({ url, pluginName, apiId }) {
+let getPlugin = function ({url, pluginName, apiId, headers}) {
     let options = {
-        uri: apiId ? `${url}/apis/${apiId}/plugins/${pluginName}` : `${url}/plugins/${pluginName}`
+        uri: apiId ? `${url}/apis/${apiId}/plugins/${pluginName}` : `${url}/plugins/${pluginName}`,
+        headers: headers
     };
-    logger.info({ req: options }, 'getPlugin');
+    logger.info({req: options}, 'getPlugin');
     var requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.get, requestOptions, [200]);
 };
 
-let getPlugins = function ({ url, apiId, pluginName, size, offset }) {
+let getPlugins = function ({url, apiId, pluginName, size, offset, headers}) {
     let options = {
-        uri: apiId ? `${url}/apis/${apiId}/plugins/` : `${url}/plugins/`
+        uri: apiId ? `${url}/apis/${apiId}/plugins/` : `${url}/plugins/`,
+        headers: headers
     };
 
     let qs = {};
@@ -82,7 +89,7 @@ let getPlugins = function ({ url, apiId, pluginName, size, offset }) {
         options.qs = qs;
     }
 
-    logger.info({ req: options }, 'getPlugins');
+    logger.info({req: options}, 'getPlugins');
     var requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.get, requestOptions, [200]);
 };
