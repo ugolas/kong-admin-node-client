@@ -51,7 +51,8 @@ describe('Kong API tests', () => {
         before(() => {
             kongAPI = new KongAPI({
                 kong_config: {
-                    kong_admin_api_url: url
+                    kong_admin_api_url: url,
+                    session_token: "sessionToken"
                 }
             });
 
@@ -102,7 +103,7 @@ describe('Kong API tests', () => {
                             url: url,
                             apiName: api.name,
                             headers: {
-                                "Authorization": "Bearer undefined"
+                                Authorization: `Bearer sessionToken`
                             }
                         })).eql(true);
                     }
@@ -180,9 +181,6 @@ describe('Kong API tests', () => {
                             body: {
                                 name: pluginsToCreate[0].name,
                                 config: pluginsToCreate[0].config
-                            },
-                            headers: {
-                                "Authorization": "Bearer undefined"
                             }
                         })).eql(true);
                 });
@@ -229,9 +227,6 @@ describe('Kong API tests', () => {
                             body: {
                                 name: pluginsToCreate[0].name,
                                 config: pluginsToCreate[0].config
-                            },
-                            headers: {
-                                "Authorization": "Bearer undefined"
                             }
                         })).eql(true);
                 });
@@ -297,9 +292,6 @@ describe('Kong API tests', () => {
                             body: {
                                 name: pluginsToCreate[0].name,
                                 config: pluginsToCreate[0].config
-                            },
-                            headers: {
-                                "Authorization": "Bearer undefined"
                             }
                         })).eql(true);
                 });
@@ -363,9 +355,6 @@ describe('Kong API tests', () => {
                             body: {
                                 name: pluginsToCreate[0].name,
                                 config: pluginsToCreate[0].config
-                            },
-                            headers: {
-                                "Authorization": "Bearer undefined"
                             }
                         })).eql(true);
                 });
@@ -407,9 +396,6 @@ describe('Kong API tests', () => {
                             apiId: apiName,
                             body: {
                                 name: plugin.name
-                            },
-                            headers: {
-                                "Authorization": "Bearer undefined"
                             }
                         })).eql(true);
                     }
@@ -452,10 +438,7 @@ describe('Kong API tests', () => {
                     should(getPluginsStub.calledOnce).eql(true);
                     should(res).eql([plugin1]);
                     should(getPluginsStub.args[0][0]).eql({
-                        url: 'url', size: 100, apiId: 'api', offset: undefined,
-                        headers: {
-                            "Authorization": "Bearer undefined"
-                        }
+                        url: 'url', size: 100, apiId: 'api', offset: undefined
                     })
                 });
         });
@@ -488,14 +471,8 @@ describe('Kong API tests', () => {
                 .then((res) => {
                     should(getPluginsStub.calledTwice).eql(true);
                     should(res).eql([plugin1, plugin2]);
-                    should(getPluginsStub.args[0][0]).eql({url: 'url', size: 100, apiId: 'api', offset: undefined,
-                        headers: {
-                            "Authorization": "Bearer undefined"
-                        }});
-                    should(getPluginsStub.args[1][0]).eql({url: 'url', size: 100, apiId: 'api', offset: "some_offset",
-                        headers: {
-                            "Authorization": "Bearer undefined"
-                        }});
+                    should(getPluginsStub.args[0][0]).eql({url: 'url', size: 100, apiId: 'api', offset: undefined});
+                    should(getPluginsStub.args[1][0]).eql({url: 'url', size: 100, apiId: 'api', offset: "some_offset",});
                 });
         });
 
@@ -552,9 +529,6 @@ describe('Kong API tests', () => {
                         url: url,
                         body: {
                             name: api
-                        },
-                        headers: {
-                            "Authorization": "Bearer undefined"
                         }
                     })).eql(true);
                 });
@@ -593,9 +567,6 @@ describe('Kong API tests', () => {
                         body: {
                             id: 'api-id',
                             name: api
-                        },
-                        headers: {
-                            "Authorization": "Bearer undefined"
                         }
                     })).eql(true);
                 });
@@ -719,10 +690,7 @@ describe('Kong API tests', () => {
                     should(getAPIStub.calledOnce).eql(true);
                     should(getAPIStub.calledWith({
                         url: url,
-                        queryParams: undefined,
-                        headers: {
-                            "Authorization": "Bearer undefined"
-                        }
+                        queryParams: undefined
                     })).eql(true);
                     should(response.length).eql(2);
                     should(response[0].name).eql('api1');
@@ -748,10 +716,7 @@ describe('Kong API tests', () => {
                     should(getAPIStub.calledOnce).eql(true);
                     should(getAPIStub.calledWith({
                         url: url,
-                        queryParams: 'queryParams',
-                        headers: {
-                            "Authorization": "Bearer undefined"
-                        }
+                        queryParams: 'queryParams'
                     })).eql(true);
                     should(response.length).eql(2);
                     should(response[0].name).eql('api1');
