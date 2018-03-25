@@ -2,13 +2,30 @@ let _ = require('lodash'),
     logger = require('./logger'),
     request = require('request-promise');
 
+
+function maskFields(jsonObj) {
+    let jsonObjCopy = _.cloneDeepWith(jsonObj, function (value, key) {
+
+        if (typeof key === 'string') {
+            key = key.toLowerCase()
+        }
+
+        if (key === 'authorization') {
+            return "XXXXX"
+        }
+    });
+
+    return jsonObjCopy;
+};
+
+
 let createAPI = function ({url, body, headers}) {
     let options = {
         uri: `${url}/apis`,
         body: body,
         headers: headers
     };
-    logger.info({req: options}, 'createAPI');
+    logger.info(maskFields(maskFields({req: options})), 'createAPI');
     var requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.put, requestOptions, [200, 201]);
 };
@@ -18,7 +35,7 @@ let deleteAPI = function ({url, apiName, headers}) {
         uri: `${url}/apis/${apiName}`,
         headers: headers
     };
-    logger.info({req: options}, 'deleteAPI');
+    logger.info(maskFields({req: options}), 'deleteAPI');
     var requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.delete, requestOptions, [204, 404]);
 };
@@ -28,7 +45,7 @@ let deletePlugin = function ({url, apiName, pluginId, headers}) {
         uri: `${url}/apis/${apiName}/plugins/${pluginId}`,
         headers: headers
     };
-    logger.info({req: options}, 'deletePlugin');
+    logger.info(maskFields({req: options}), 'deletePlugin');
     let requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.delete, requestOptions, [204, 404]);
 };
@@ -47,7 +64,7 @@ let getAPI = function ({url, apiName, queryParams, headers}) {
         options.qs = queryParams
     }
 
-    logger.info({req: options}, 'getAPI');
+    logger.info(maskFields({req: options}), 'getAPI');
     let requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.get, requestOptions, [200, 404]);
 };
@@ -58,7 +75,7 @@ let createPlugin = function ({url, apiId, body, headers}) {
         body: body,
         headers: headers
     };
-    logger.info({req: options}, 'createPlugin');
+    logger.info(maskFields({req: options}), 'createPlugin');
     var requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.put, requestOptions, [200, 201]);
 };
@@ -68,7 +85,7 @@ let getPlugin = function ({url, pluginName, apiId, headers}) {
         uri: apiId ? `${url}/apis/${apiId}/plugins/${pluginName}` : `${url}/plugins/${pluginName}`,
         headers: headers
     };
-    logger.info({req: options}, 'getPlugin');
+    logger.info(maskFields({req: options}), 'getPlugin');
     var requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.get, requestOptions, [200]);
 };
@@ -89,7 +106,7 @@ let getPlugins = function ({url, apiId, pluginName, size, offset, headers}) {
         options.qs = qs;
     }
 
-    logger.info({req: options}, 'getPlugins');
+    logger.info(maskFields({req: options}), 'getPlugins');
     var requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.get, requestOptions, [200]);
 };
