@@ -25,7 +25,7 @@ let createAPI = function ({url, body, headers}) {
         body: body,
         headers: headers
     };
-    logger.info(maskFields(maskFields({req: options})), 'createAPI');
+    logger.info(maskFields({req: options}), 'createAPI');
     var requestOptions = _.assign(options, basicRequest);
     return sendRequestAndProcessError(request.put, requestOptions, [200, 201]);
 };
