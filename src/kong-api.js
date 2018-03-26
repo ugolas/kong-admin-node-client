@@ -182,7 +182,7 @@ class KongAPI {
     async createPlugins(plugins, apiName) {
         logger.info(apiName ? `Setting up plugins in api: ${apiName}, ${plugins.length} in total` : `Setting up plugins, ${plugins.length} in total`);
 
-        let pluginsToDelete = await getPluginsToDelete(this.kongAdminUrl, plugins, apiName);
+        let pluginsToDelete = await getPluginsToDelete(this.kongAdminUrl, plugins, apiName, this.sessionToken, this.accountId);
 
         // Create or update plugins
         for (let plugin of plugins) {
@@ -287,7 +287,7 @@ function addIdentityHeadersToRequest(sessionToken, accountId, request) {
     return request;
 }
 
-async function getPluginsToDelete(kongAdminUrl, plugins, apiName) {
+async function getPluginsToDelete(kongAdminUrl, plugins, apiName, sessionToken, accountId) {
     let pluginsToDelete = [];
 
     let offset = undefined;
@@ -301,7 +301,7 @@ async function getPluginsToDelete(kongAdminUrl, plugins, apiName) {
             url: kongAdminUrl,
             size: 100,
         };
-        getPluginsRequest = addIdentityHeadersToRequest(this.sessionToken, this.accountId, getPluginsRequest);
+        getPluginsRequest = addIdentityHeadersToRequest(sessionToken, accountId, getPluginsRequest);
 
         if (apiName) getPluginsRequest.apiId = apiName;
         getPluginsRequest.offset = offset;
