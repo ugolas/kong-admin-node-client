@@ -11,6 +11,7 @@ Client API for configuring Kong admin.
 - Adding APIs
 - Adding Plugins per API
 - Adding plugins in root (for all APIs)
+- Send accountId in request accountId (the function KongApi.setXZoozAccountId('*'))
 
 ## Road map
 - Implementing all Kong Admin APIs
@@ -51,7 +52,9 @@ let kongAPI = new KongAPI({
                 "message": "So long and thanks for all the fish!"
             }
         }]
-    }
+    },
+    session_token : 'sessionToken', // not mandatory
+    account_id: '*' // not mandatory 
 });
 
 
@@ -62,6 +65,7 @@ kongAPI.createConfigurations()
     .catch((err) => {
         // Failure
     });
+
 
 ```
 [npm-image]: https://img.shields.io/npm/v/express-requests-logger.svg?style=flat

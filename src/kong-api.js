@@ -9,9 +9,13 @@ class KongAPI {
         }
         this.kong_config = options.kong_config;
         this.sessionToken = options.session_token;
+        this.accountId = options.account_id;
         this.kongAdminUrl = this.kong_config.kong_admin_api_url;
     }
 
+    async setXZoozAccountId(accountId) {
+        this.accountId = accountId;
+    }
     async createConfigurations() {
         let kongAdminUrl = this.kong_config.kong_admin_api_url;
 
@@ -51,7 +55,7 @@ class KongAPI {
                 apiName: api.name,
             };
 
-            getApiRequest = addSessionTokenToRequest(this.sessionToken, getApiRequest)
+            getApiRequest = addIdentityHeadersToRequest(this.sessionToken, this.accountId, getApiRequest)
 
             let getResponse = await httpHelper.getAPI(getApiRequest);
 
@@ -67,7 +71,7 @@ class KongAPI {
                 url: this.kongAdminUrl,
                 body: api,
             };
-            createApiRequest = addSessionTokenToRequest(this.sessionToken, createApiRequest)
+            createApiRequest = addIdentityHeadersToRequest(this.sessionToken, this.accountId, createApiRequest)
             let response = await httpHelper.createAPI(createApiRequest);
 
             let apiId = response.body.id;
@@ -91,7 +95,7 @@ class KongAPI {
                 queryParams: options && typeof options === 'object' && options.queryParams,
             };
 
-            getApiRequest = addSessionTokenToRequest(this.sessionToken, getApiRequest)
+            getApiRequest = addIdentityHeadersToRequest(this.sessionToken, this.accountId, getApiRequest)
 
             let response = await httpHelper.getAPI(getApiRequest);
 
@@ -117,7 +121,7 @@ class KongAPI {
                 url: this.kongAdminUrl,
                 apiName: api.name,
             };
-            getApiRequest = addSessionTokenToRequest(this.sessionToken, getApiRequest);
+            getApiRequest = addIdentityHeadersToRequest(this.sessionToken, this.accountId, getApiRequest);
 
             let response = await httpHelper.getAPI(getApiRequest);
 
@@ -139,7 +143,7 @@ class KongAPI {
                 url: this.kongAdminUrl,
                 apiName: api.name,
             };
-            deleteApiRequest = addSessionTokenToRequest(this.sessionToken, deleteApiRequest);
+            deleteApiRequest = addIdentityHeadersToRequest(this.sessionToken, this.accountId, deleteApiRequest);
 
             let removeResponse = await httpHelper.deleteAPI(deleteApiRequest);
 
@@ -163,7 +167,7 @@ class KongAPI {
                 pluginId: plugin.id
 
             };
-            deletePluginRequest = addSessionTokenToRequest(this.sessionToken, deletePluginRequest);
+            deletePluginRequest = addIdentityHeadersToRequest(this.sessionToken, this.accountId, deletePluginRequest);
 
             let removeResponse = await httpHelper.deletePlugin(deletePluginRequest);
 
@@ -189,7 +193,7 @@ class KongAPI {
                 url: this.kongAdminUrl,
                 apiId: apiName
             };
-            getPluginRequest = addSessionTokenToRequest(this.sessionToken, getPluginRequest);
+            getPluginRequest = addIdentityHeadersToRequest(this.sessionToken, this.accountId, getPluginRequest);
 
             let getPluginsResponse = await httpHelper.getPlugins(getPluginRequest);
 
@@ -215,7 +219,7 @@ class KongAPI {
                 apiId: apiName,
                 body: plugin
             };
-            createPluginRequest = addSessionTokenToRequest(this.sessionToken, createPluginRequest);
+            createPluginRequest = addIdentityHeadersToRequest(this.sessionToken, this.accountId, createPluginRequest);
 
             let response = await httpHelper.createPlugin(createPluginRequest);
 
@@ -244,7 +248,7 @@ class KongAPI {
                     size: 100
                 };
 
-                getPluginsRequest = addSessionTokenToRequest(this.sessionToken, getPluginsRequest);
+                getPluginsRequest = addIdentityHeadersToRequest(this.sessionToken, this.accountId, getPluginsRequest);
 
                 getPluginsRequest.apiId = apiName;
                 getPluginsRequest.offset = offset;
@@ -268,11 +272,17 @@ class KongAPI {
     }
 }
 
-function addSessionTokenToRequest(sessionToken, request) {
+function addIdentityHeadersToRequest(sessionToken, accountId, request) {
     if (sessionToken) {
-        request.headers = {
+        request.headers = _.assign(request.headers,{
             Authorization: `Bearer ${sessionToken}`
-        }
+        })
+    }
+
+    if (accountId){
+        request.headers = _.assign(request.headers,{
+            ['x-zooz-account-id']: accountId
+        })
     }
     return request;
 }
@@ -291,7 +301,7 @@ async function getPluginsToDelete(kongAdminUrl, plugins, apiName) {
             url: kongAdminUrl,
             size: 100,
         };
-        getPluginsRequest = addSessionTokenToRequest(this.sessionToken, getPluginsRequest);
+        getPluginsRequest = addIdentityHeadersToRequest(this.sessionToken, this.accountId, getPluginsRequest);
 
         if (apiName) getPluginsRequest.apiId = apiName;
         getPluginsRequest.offset = offset;

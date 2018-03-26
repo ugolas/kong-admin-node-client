@@ -53,7 +53,8 @@ describe('Kong API tests', () => {
                 kong_config: {
                     kong_admin_api_url: url,
                 },
-                session_token: "sessionToken"
+                session_token: "sessionToken",
+                account_id: '*'
             });
 
             apis = [{
@@ -103,7 +104,8 @@ describe('Kong API tests', () => {
                             url: url,
                             apiName: api.name,
                             headers: {
-                                Authorization: `Bearer sessionToken`
+                                Authorization: `Bearer sessionToken`,
+                                ['x-zooz-account-id']: '*'
                             }
                         })).eql(true);
                     }
