@@ -1,10 +1,12 @@
 let request = require('request-promise'),
     httpHelper = require('../src/http-helper'),
+    logger = require('../src/logger'),
+    common = require('../src/common'),
     should = require('should'),
     sinon = require('sinon');
 
 describe('HTTP helper test', () => {
-    let getStub, putStub, deleteStub;
+    let getStub, putStub, infoStub, deleteStub;
     let sandbox;
     let url = 'url';
     let name = 'name';
@@ -16,6 +18,7 @@ describe('HTTP helper test', () => {
 
         getStub = sandbox.stub(request, 'get');
         putStub = sandbox.stub(request, 'put');
+        infoStub = sandbox.stub(logger, 'info');
         deleteStub = sandbox.stub(request, 'delete');
     });
     after(() => {
@@ -25,19 +28,34 @@ describe('HTTP helper test', () => {
         beforeEach(() => {
             sandbox.resetHistory();
         });
-        it('Should succeed if success', () => {
+        it('Should succeed if success and mask required fields.', () => {
             putStub.returns(Promise.resolve({
                 statusCode: 200
             }));
+
+            common.MASKING_FIELDS = common.MASKING_FIELDS.concat(["trymasking"]);
 
             return httpHelper.createAPI({
                 url: url,
                 body: sampleBody,
                 headers: {
-                    "Authorization": "Bearer try"
+                    "Authorization": "Bearer try",
+                    "tryMasking" : "hey"
                 }
             }).then(() => {
                 should(putStub.calledOnce).eql(true);
+                should(infoStub.args[0][0]).eql({
+                    "req": {
+                        "body": {
+                            "name": "name"
+                        },
+                        "headers": {
+                            "Authorization": "XXXXX",
+                            "tryMasking": "XXXXX"
+                        },
+                        "uri": "url/apis"
+                    }
+                });
                 should(putStub.calledWith({
                     'content-type': 'application/json',
                     resolveWithFullResponse: true,
@@ -46,7 +64,8 @@ describe('HTTP helper test', () => {
                     uri: url + '/apis',
                     body: sampleBody,
                     headers: {
-                        "Authorization": "Bearer try"
+                        "Authorization": "Bearer try",
+                        "tryMasking": "hey"
                     }
                 })).eql(true);
             });

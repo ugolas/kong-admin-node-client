@@ -1,20 +1,22 @@
 let _ = require('lodash'),
     logger = require('./logger'),
+    common = require('./common'),
     request = require('request-promise');
 
 
 function maskFields(jsonObj) {
+    let fieldsToMask = common.MASKING_FIELDS;
+
     let jsonObjCopy = _.cloneDeepWith(jsonObj, function (value, key) {
 
         if (typeof key === 'string') {
             key = key.toLowerCase()
         }
 
-        if (key === 'authorization') {
+        if (_.includes(fieldsToMask, key)) {
             return "XXXXX"
         }
     });
-
     return jsonObjCopy;
 };
 

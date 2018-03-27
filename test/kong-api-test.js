@@ -52,8 +52,11 @@ describe('Kong API tests', () => {
             kongAPI = new KongAPI({
                 kong_config: {
                     kong_admin_api_url: url,
-                },
-                session_token: "sessionToken"
+                    headers : {
+                        Authorization: `Bearer sessionToken`,
+                        ['x-zooz-account-id']: '*'
+                    }
+                }
             });
 
             apis = [{
@@ -95,7 +98,11 @@ describe('Kong API tests', () => {
                 statusCode: 204
             }));
 
-            return kongAPI.removeAPIs(apis)
+            let headers = {
+                Authorization: `Bearer overRide`,
+                ['x-zooz-account-id']: '*'
+            };
+            return kongAPI.removeAPIs(apis, headers)
                 .then(() => {
                     should(deleteAPIStub.callCount).eql(3);
                     for (let api of apis) {
@@ -103,7 +110,8 @@ describe('Kong API tests', () => {
                             url: url,
                             apiName: api.name,
                             headers: {
-                                Authorization: `Bearer sessionToken`
+                                Authorization: `Bearer overRide`,
+                                ['x-zooz-account-id']: '*'
                             }
                         })).eql(true);
                     }
@@ -472,7 +480,12 @@ describe('Kong API tests', () => {
                     should(getPluginsStub.calledTwice).eql(true);
                     should(res).eql([plugin1, plugin2]);
                     should(getPluginsStub.args[0][0]).eql({url: 'url', size: 100, apiId: 'api', offset: undefined});
-                    should(getPluginsStub.args[1][0]).eql({url: 'url', size: 100, apiId: 'api', offset: "some_offset",});
+                    should(getPluginsStub.args[1][0]).eql({
+                        url: 'url',
+                        size: 100,
+                        apiId: 'api',
+                        offset: "some_offset",
+                    });
                 });
         });
 
@@ -558,6 +571,7 @@ describe('Kong API tests', () => {
                     id: 'id'
                 }
             }));
+
             return kongAPI.createApis(apis)
                 .then(() => {
                     should(createAPIStub.calledOnce).eql(true);

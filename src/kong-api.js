@@ -1,4 +1,5 @@
 let httpHelper = require('./http-helper'),
+    common = require('./common'),
     _ = require('lodash'),
     logger = require('./logger');
 
@@ -7,9 +8,11 @@ class KongAPI {
         if (!options.kong_config || !options.kong_config.kong_admin_api_url) {
             throw new Error('kong_config & kong_config.kong_admin_api_url is mandatory');
         }
+
         this.kong_config = options.kong_config;
-        this.sessionToken = options.session_token;
+        this.headers = options.headers;
         this.kongAdminUrl = this.kong_config.kong_admin_api_url;
+        common.MASKING_FIELDS = common.MASKING_FIELDS.concat(options.headers_to_mask || []);
     }
 
     async createConfigurations() {
@@ -36,7 +39,7 @@ class KongAPI {
         logger.info('Successfully completed configuration');
     }
 
-    async createApis(apis) {
+    async createApis(apis, headers) {
         logger.info(`Setting up apis, ${apis.length} in total`);
         for (let api of apis) {
             // Clone the API object to delete the plugins from the request body:
@@ -51,7 +54,7 @@ class KongAPI {
                 apiName: api.name,
             };
 
-            getApiRequest = addSessionTokenToRequest(this.sessionToken, getApiRequest)
+            getApiRequest = addHeadersToRequest(this.headers, headers, getApiRequest);
 
             let getResponse = await httpHelper.getAPI(getApiRequest);
 
@@ -67,7 +70,7 @@ class KongAPI {
                 url: this.kongAdminUrl,
                 body: api,
             };
-            createApiRequest = addSessionTokenToRequest(this.sessionToken, createApiRequest)
+            createApiRequest = addHeadersToRequest(this.headers, headers, createApiRequest);
             let response = await httpHelper.createAPI(createApiRequest);
 
             let apiId = response.body.id;
@@ -80,7 +83,7 @@ class KongAPI {
         }
     }
 
-    async getAPIs(apis, options) {
+    async getAPIs(apis, options, headers) {
         let getResponse = [];
         apis = Array.isArray(apis) ? apis : [];
 
@@ -91,7 +94,7 @@ class KongAPI {
                 queryParams: options && typeof options === 'object' && options.queryParams,
             };
 
-            getApiRequest = addSessionTokenToRequest(this.sessionToken, getApiRequest)
+            getApiRequest = addHeadersToRequest(this.headers, headers, getApiRequest);
 
             let response = await httpHelper.getAPI(getApiRequest);
 
@@ -117,7 +120,7 @@ class KongAPI {
                 url: this.kongAdminUrl,
                 apiName: api.name,
             };
-            getApiRequest = addSessionTokenToRequest(this.sessionToken, getApiRequest);
+            getApiRequest = addHeadersToRequest(this.headers, headers, getApiRequest);
 
             let response = await httpHelper.getAPI(getApiRequest);
 
@@ -129,7 +132,7 @@ class KongAPI {
         return getResponse;
     }
 
-    async removeAPIs(apis) {
+    async removeAPIs(apis, headers) {
         logger.info(`Removing apis from kong, ${apis.length} in total`);
         for (let api of apis) {
             logger.info(`Removing api: ${api.name}, ${apis.indexOf(api) + 1} out of ${apis.length} apis`);
@@ -139,7 +142,7 @@ class KongAPI {
                 url: this.kongAdminUrl,
                 apiName: api.name,
             };
-            deleteApiRequest = addSessionTokenToRequest(this.sessionToken, deleteApiRequest);
+            deleteApiRequest = addHeadersToRequest(this.headers, headers, deleteApiRequest);
 
             let removeResponse = await httpHelper.deleteAPI(deleteApiRequest);
 
@@ -151,7 +154,7 @@ class KongAPI {
         }
     }
 
-    async removePlugins(plugins, apiName) {
+    async removePlugins(plugins, apiName, headers) {
         logger.info(apiName ? `Removing plugins from kong api: ${apiName}. ${plugins.length} in total` : `Removing plugins from kong in root api. ${plugins.length} in total`);
         for (let i = 0; i < plugins.length; i++) {
             let plugin = plugins[i];
@@ -163,7 +166,7 @@ class KongAPI {
                 pluginId: plugin.id
 
             };
-            deletePluginRequest = addSessionTokenToRequest(this.sessionToken, deletePluginRequest);
+            deletePluginRequest = addHeadersToRequest(this.headers, headers, deletePluginRequest);
 
             let removeResponse = await httpHelper.deletePlugin(deletePluginRequest);
 
@@ -175,10 +178,10 @@ class KongAPI {
         }
     }
 
-    async createPlugins(plugins, apiName) {
+    async createPlugins(plugins, apiName, headers) {
         logger.info(apiName ? `Setting up plugins in api: ${apiName}, ${plugins.length} in total` : `Setting up plugins, ${plugins.length} in total`);
 
-        let pluginsToDelete = await getPluginsToDelete(this.kongAdminUrl, plugins, apiName);
+        let pluginsToDelete = await getPluginsToDelete(this.kongAdminUrl, plugins, apiName, this.headers, headers);
 
         // Create or update plugins
         for (let plugin of plugins) {
@@ -189,7 +192,7 @@ class KongAPI {
                 url: this.kongAdminUrl,
                 apiId: apiName
             };
-            getPluginRequest = addSessionTokenToRequest(this.sessionToken, getPluginRequest);
+            getPluginRequest = addHeadersToRequest(this.headers, headers, getPluginRequest);
 
             let getPluginsResponse = await httpHelper.getPlugins(getPluginRequest);
 
@@ -215,7 +218,7 @@ class KongAPI {
                 apiId: apiName,
                 body: plugin
             };
-            createPluginRequest = addSessionTokenToRequest(this.sessionToken, createPluginRequest);
+            createPluginRequest = addHeadersToRequest(this.headers, headers, createPluginRequest);
 
             let response = await httpHelper.createPlugin(createPluginRequest);
 
@@ -228,7 +231,7 @@ class KongAPI {
         }
     }
 
-    async getPluginsOfExistApi(apiName) {
+    async getPluginsOfExistApi(apiName, headers) {
         if (apiName) {
             let plugins = [];
 
@@ -244,7 +247,7 @@ class KongAPI {
                     size: 100
                 };
 
-                getPluginsRequest = addSessionTokenToRequest(this.sessionToken, getPluginsRequest);
+                getPluginsRequest = addHeadersToRequest(this.headers, headers, getPluginsRequest);
 
                 getPluginsRequest.apiId = apiName;
                 getPluginsRequest.offset = offset;
@@ -268,16 +271,17 @@ class KongAPI {
     }
 }
 
-function addSessionTokenToRequest(sessionToken, request) {
-    if (sessionToken) {
-        request.headers = {
-            Authorization: `Bearer ${sessionToken}`
-        }
+function addHeadersToRequest(constructorHeaders, overrideHeaders, request) {
+    let headers = overrideHeaders || constructorHeaders;
+
+    if (headers) {
+        request.headers = headers;
     }
+
     return request;
 }
 
-async function getPluginsToDelete(kongAdminUrl, plugins, apiName) {
+async function getPluginsToDelete(kongAdminUrl, plugins, apiName, constructorHeaders, overrideHeaders) {
     let pluginsToDelete = [];
 
     let offset = undefined;
@@ -291,7 +295,7 @@ async function getPluginsToDelete(kongAdminUrl, plugins, apiName) {
             url: kongAdminUrl,
             size: 100,
         };
-        getPluginsRequest = addSessionTokenToRequest(this.sessionToken, getPluginsRequest);
+        getPluginsRequest = addHeadersToRequest(constructorHeaders, overrideHeaders, getPluginsRequest);
 
         if (apiName) getPluginsRequest.apiId = apiName;
         getPluginsRequest.offset = offset;
