@@ -52,6 +52,10 @@ describe('Kong API tests', () => {
             kongAPI = new KongAPI({
                 kong_config: {
                     kong_admin_api_url: url,
+                    headers : {
+                        Authorization: `Bearer sessionToken`,
+                        ['x-zooz-account-id']: '*'
+                    }
                 }
             });
 
@@ -95,7 +99,7 @@ describe('Kong API tests', () => {
             }));
 
             let headers = {
-                Authorization: `Bearer sessionToken`,
+                Authorization: `Bearer overRide`,
                 ['x-zooz-account-id']: '*'
             };
             return kongAPI.removeAPIs(apis, headers)
@@ -106,7 +110,7 @@ describe('Kong API tests', () => {
                             url: url,
                             apiName: api.name,
                             headers: {
-                                Authorization: `Bearer sessionToken`,
+                                Authorization: `Bearer overRide`,
                                 ['x-zooz-account-id']: '*'
                             }
                         })).eql(true);
