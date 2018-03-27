@@ -11,7 +11,6 @@ Client API for configuring Kong admin.
 - Adding APIs
 - Adding Plugins per API
 - Adding plugins in root (for all APIs)
-- Send accountId in request accountId (the function KongApi.setXZoozAccountId('*'))
 
 ## Road map
 - Implementing all Kong Admin APIs
@@ -53,8 +52,7 @@ let kongAPI = new KongAPI({
             }
         }]
     },
-    session_token : 'sessionToken', // not mandatory
-    account_id: '*' // not mandatory 
+    headers:  {} //headersObj
 });
 
 
@@ -68,6 +66,11 @@ kongAPI.createConfigurations()
 
 
 ```
+
+## Note
+per each function (createApis,getAPIs,removeAPIs,removePlugins,createPlugins,getPluginsOfExistApi) headers object can be send, that will **overirde** the constructor headers.
+
+
 [npm-image]: https://img.shields.io/npm/v/express-requests-logger.svg?style=flat
 [npm-url]: https://www.npmjs.com/package/kong-admin-node-client
 [travis-image]: https://travis-ci.org/ugolas/kong-admin-node-client.svg?branch=master
