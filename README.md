@@ -52,7 +52,8 @@ let kongAPI = new KongAPI({
             }
         }]
     },
-    headers:  {} //headersObj
+    headers:  {}, //headersObj,
+    headers_to_mask: ['maskHeader1', 'maskHeader2'] // array of fields the logger should mask. 
 });
 
 
@@ -68,7 +69,7 @@ kongAPI.createConfigurations()
 ```
 
 ## Note
-per each function (createApis,getAPIs,removeAPIs,removePlugins,createPlugins,getPluginsOfExistApi) headers object can be send, that will **overirde** the constructor headers.
+per each function (createApis,getAPIs,removeAPIs,removePlugins,createPlugins,getPluginsOfExistApi) headers object can be sent, which will **override** the headers provided in the constructor (if any).
 
 
 [npm-image]: https://img.shields.io/npm/v/express-requests-logger.svg?style=flat
