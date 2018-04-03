@@ -190,7 +190,8 @@ class KongAPI {
             // Try finding existing plugin
             let getPluginRequest = {
                 url: this.kongAdminUrl,
-                apiId: apiName
+                apiId: apiName,
+                pluginName: plugin.name
             };
             getPluginRequest = addHeadersToRequest(this.headers, headers, getPluginRequest);
 
@@ -300,8 +301,7 @@ async function getPluginsToDelete(kongAdminUrl, plugins, apiName, constructorHea
         if (apiName) getPluginsRequest.apiId = apiName;
         getPluginsRequest.offset = offset;
 
-        let getPluginsResponse = await
-            httpHelper.getPlugins(getPluginsRequest);
+        let getPluginsResponse = await httpHelper.getPlugins(getPluginsRequest);
 
         if (apiName) {
             getPluginsResponse.body.data.forEach((plugin) => {

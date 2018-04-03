@@ -10,11 +10,11 @@ function maskFields(jsonObj) {
     let jsonObjCopy = _.cloneDeepWith(jsonObj, function (value, key) {
 
         if (typeof key === 'string') {
-            key = key.toLowerCase()
+            key = key.toLowerCase();
         }
 
         if (_.includes(fieldsToMask, key)) {
-            return "XXXXX"
+            return 'XXXXX';
         }
     });
     return jsonObjCopy;
@@ -63,7 +63,7 @@ let getAPI = function ({url, apiName, queryParams, headers}) {
     }
 
     if (queryParams) {
-        options.qs = queryParams
+        options.qs = queryParams;
     }
 
     logger.info(maskFields({req: options}), 'getAPI');

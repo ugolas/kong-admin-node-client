@@ -53,7 +53,7 @@ describe('Kong API tests', () => {
                 kong_config: {
                     kong_admin_api_url: url,
                     headers : {
-                        Authorization: `Bearer sessionToken`,
+                        Authorization: 'Bearer sessionToken',
                         ['x-zooz-account-id']: '*'
                     }
                 }
@@ -99,7 +99,7 @@ describe('Kong API tests', () => {
             }));
 
             let headers = {
-                Authorization: `Bearer overRide`,
+                Authorization: 'Bearer overRide',
                 ['x-zooz-account-id']: '*'
             };
             return kongAPI.removeAPIs(apis, headers)
@@ -110,7 +110,7 @@ describe('Kong API tests', () => {
                             url: url,
                             apiName: api.name,
                             headers: {
-                                Authorization: `Bearer overRide`,
+                                Authorization: 'Bearer overRide',
                                 ['x-zooz-account-id']: '*'
                             }
                         })).eql(true);
@@ -291,6 +291,13 @@ describe('Kong API tests', () => {
             return kongAPI.createPlugins(pluginsToCreate, apiName)
                 .then(() => {
                     should(getPluginsStub.calledThrice).eql(true);
+
+                    should(getPluginsStub.getCall(2).args[0]).eql({
+                        apiId: 'api',
+                        pluginName: 'plugin-name',
+                        url: 'url'
+                    });
+
                     should(createPluginStub.calledOnce).eql(true);
                     should(deletePluginStub.calledTwice).eql(true);
                     should(createPluginStub.calledWith(
@@ -428,7 +435,7 @@ describe('Kong API tests', () => {
 
         it('Should succeed and get plugins', () => {
             let plugin1 = {
-                name: "first plugin"
+                name: 'first plugin'
             };
             getPluginsStub.onFirstCall().returns(Promise.resolve({
                 statusCode: 200,
@@ -436,7 +443,7 @@ describe('Kong API tests', () => {
                     data: [plugin1]
                 },
                 headers: {
-                    "Authorization": "Bearer undefined"
+                    'Authorization': 'Bearer undefined'
                 }
             }));
 
@@ -447,15 +454,15 @@ describe('Kong API tests', () => {
                     should(res).eql([plugin1]);
                     should(getPluginsStub.args[0][0]).eql({
                         url: 'url', size: 100, apiId: 'api', offset: undefined
-                    })
+                    });
                 });
         });
         it('Should succeed and get plugins with offest', () => {
             let plugin1 = {
-                name: "first plugin"
+                name: 'first plugin'
             };
             let plugin2 = {
-                name: "second plugin"
+                name: 'second plugin'
             };
             getPluginsStub.onFirstCall().returns(Promise.resolve({
                 statusCode: 200,
@@ -470,7 +477,7 @@ describe('Kong API tests', () => {
                     data: [plugin2]
                 },
                 headers: {
-                    "Authorization": "Bearer undefined"
+                    'Authorization': 'Bearer undefined'
                 }
             }));
 
@@ -484,7 +491,7 @@ describe('Kong API tests', () => {
                         url: 'url',
                         size: 100,
                         apiId: 'api',
-                        offset: "some_offset",
+                        offset: 'some_offset',
                     });
                 });
         });
