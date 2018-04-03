@@ -30,7 +30,7 @@
     "bunyan": "^1.8.12",
     "lodash": "^4.17.4",
     "pkginfo": "^0.4.1",
-    "request": "^2.83.0",
+    "request": "^2.85.0",
     "request-promise": "^4.2.2"
   },
   "devDependencies": {
