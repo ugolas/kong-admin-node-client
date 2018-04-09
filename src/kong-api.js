@@ -32,7 +32,7 @@ class KongAPI {
                 await this.createPlugins(rootPlugins);
             }
         } catch (err) {
-            logger.error(err, 'Error during configuration creation');
+            logger.error(err.message, 'Error during configuration creation');
             throw (err);
         }
 
